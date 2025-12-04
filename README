@@ -1,0 +1,30 @@
+// Pentru rularea aplicatiei se vor urmarii urmatorii pasi:
+
+// 1. PORNIREA SERVERELOR
+// Se vor porni din xxamp serverele:
+//  * MySQL Database
+//  *Apache Web Server
+
+// 2.RULAREA APLICATIEI
+// *Pentru backend:
+//     ->terminal ->cd backend->node server.js
+// 
+// *Pentru frontend:
+//     ->terminal ->cd frontend->npm start
+
+// Observatii:
+// * sa adaug entitatea "dimensiune" in tabela "cafea" avand optiunile: mica, medie, mare
+// * sa adaug entitatile "email" si "parola" in tabela "angajat"
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
