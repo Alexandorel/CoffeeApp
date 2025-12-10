@@ -61,6 +61,7 @@ app.post('/logare', (req, res) => {
     });
 });
 
+// verificare 
 
 // Pornire server
 app.listen(port, () => {
