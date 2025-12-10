@@ -61,6 +61,7 @@ app.post('/logare', (req, res) => {
     });
 });
 
+
 // Pornire server
 app.listen(port, () => {
     console.log(`Server ascultă pe portul ${port}`);

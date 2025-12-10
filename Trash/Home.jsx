@@ -1,6 +1,6 @@
 import React, { useState} from 'react'
-import Header from '../components/Header'
-import MeniuBauturi from '../components/MeniuBauturi'
+import Header from '../frontend/src/components/Header'
+import MeniuBauturi from '../frontend/src/components/MeniuBauturi'
 
 function Home() {
   const user = JSON.parse(localStorage.getItem('user'));

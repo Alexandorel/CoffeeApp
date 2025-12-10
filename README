@@ -13,10 +13,15 @@
 //     ->terminal ->cd frontend->npm start
 
 // Observatii:
-// * sa adaug entitatea "dimensiune" in tabela "cafea" avand optiunile: mica, medie, mare
-// * sa adaug entitatile "email" si "parola" in tabela "angajat"
+// * entitate "dimensiune" in tabela "cafea" avand optiunile: mica, medie, mare  ✔
+// * adaugare entitate "email" si "parola" in tabela "angajat" ✔
+// * 10 dec 2025:
+// * adaugare entitate "rol" in tabela "angajat"  ✔
+// * vor exista 2 rol uri: 
+//      'admin' pentru administrator
+//      'angajat' pentru angajat
 // 
-// 
+// material css
 // 
 // 
 // 

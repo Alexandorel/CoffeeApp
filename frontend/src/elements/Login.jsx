@@ -12,10 +12,18 @@ function Login() {
     e.preventDefault();
     try {
       const res = await axios.post('/logare', { email, password });
+      
+      //Verificare daca login
       console.log('Login reușit:', res.data);
+
+      const user = res.data.angajat;
+      const rolUser = user.rol;
       localStorage.setItem('user', JSON.stringify(res.data.angajat));
+      localStorage.setItem('role', JSON.stringify(rolUser));
+
       setError('');
-      navigate('/home');
+      if(rolUser == 'admin') navigate('/adminDashboard')
+      else navigate('/employeeDashboard');
     } catch (err) {
       console.error('Eroare login:', err.response?.data);
       setError(err.response?.data?.message || 'Eroare la login');
