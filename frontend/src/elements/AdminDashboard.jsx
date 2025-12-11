@@ -1,47 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const AdminDashboard = () => {
-  const [coffees] = useState([
-    { id: 1, name: "Espresso", price: 8, image: "☕", description: "Cafea tare și intensă" },
-    { id: 2, name: "Cappuccino", price: 12, image: "🥤", description: "Espresso cu lapte spumat" },
-    { id: 3, name: "Latte", price: 13, image: "🍵", description: "Cafea cu mult lapte" },
-    { id: 4, name: "Americano", price: 9, image: "☕", description: "Espresso diluat cu apă" },
-    { id: 5, name: "Mocha", price: 15, image: "🍫", description: "Cafea cu ciocolată" },
-    { id: 6, name: "Macchiato", price: 10, image: "☕", description: "Espresso cu puțin lapte" },
-  ]);
-
+  const [coffees, setCoffees] = useState([]);
+  //formularul pentru cart
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  //formularul pentru form ul de adaugare cafele
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newCoffee, setNewCoffee] = useState({
+  denumire: "",
+  tipBoaba: "",
+  origine: "",
+  gradulDePrajire: "",
+  dimensiune: "",
+  pret: "",
+});
+
+
+  // Preluare cafele din backend
+  useEffect(() => {
+    axios
+      .get("/cafele")
+      .then((res) => {
+        console.log("Date primite:", res.data); // Pentru debugging
+        setCoffees(res.data);
+      })
+      .catch((err) =>
+        console.error("Eroare la preluarea cafelelor:", err)
+      );
+  }, []);
 
   const addToCart = (coffee) => {
-    const exists = cart.find((item) => item.id === coffee.id);
+    // ATENTIE: Folosim idCafea, nu id
+    const exists = cart.find((item) => item.idCafea === coffee.idCafea);
     if (exists) {
-      setCart(cart.map((i) => (i.id === coffee.id ? { ...i, quantity: i.quantity + 1 } : i)));
+      setCart(
+        cart.map((i) =>
+          i.idCafea === coffee.idCafea ? { ...i, quantity: i.quantity + 1 } : i
+        )
+      );
     } else {
       setCart([...cart, { ...coffee, quantity: 1 }]);
     }
   };
 
-  const updateQuantity = (id, change) => {
+  const updateQuantity = (idCafea, change) => {
     setCart(
       cart
         .map((item) =>
-          item.id === id ? { ...item, quantity: Math.max(0, item.quantity + change) } : item
+          item.idCafea === idCafea
+            ? { ...item, quantity: Math.max(0, item.quantity + change) }
+            : item
         )
         .filter((item) => item.quantity > 0)
     );
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter((i) => i.id !== id));
+  const removeFromCart = (idCafea) => {
+    setCart(cart.filter((i) => i.idCafea !== idCafea));
   };
 
-  const getTotalPrice = () => cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  // Calculăm totalul folosind 'pret' in loc de 'price'
+  const getTotalPrice = () =>
+    cart.reduce((s, i) => s + i.pret * i.quantity, 0).toFixed(2);
+    
   const getTotalItems = () => cart.reduce((s, i) => s + i.quantity, 0);
 
   const placeOrder = () => {
     if (cart.length === 0) return;
+    
+    // Aici vei putea adăuga logica de a trimite comanda în baza de date (POST)
+    console.log("Comanda plasată:", cart);
+
     setOrderPlaced(true);
     setTimeout(() => {
       setCart([]);
@@ -50,21 +83,27 @@ const AdminDashboard = () => {
     }, 3000);
   };
 
+  const refreshCoffees = () => {
+    axios.get("http://localhost:8000/cafele")
+      .then((res) => setCoffees(res.data))
+      .catch((err) => console.error(err));
+};
+
   return (
     <div className="min-vh-100 bg-light">
       {/* Header */}
       <header className="bg-dark text-white py-4 shadow">
         <div className="container d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center gap-3">
-            <span style={{ fontSize: "40px" }}>☕</span>
-            <h1 className="fw-bold">Coffee Shop</h1>
+            <span style={{ fontSize: "40px" }}></span>
+            <h1 className="fw-bold">VintHUB Coffee</h1>
           </div>
 
           <button
             onClick={() => setShowCart(!showCart)}
             className="btn btn-warning position-relative fw-bold"
           >
-            🛒 Coș
+             Coș
             {getTotalItems() > 0 && (
               <span className="badge bg-danger position-absolute top-0 start-100 translate-middle">
                 {getTotalItems()}
@@ -77,7 +116,7 @@ const AdminDashboard = () => {
       <div className="container py-4">
         {/* Success message */}
         {orderPlaced && (
-          <div className="alert alert-success text-center position-fixed top-0 start-50 translate-middle-x mt-4 shadow-lg">
+          <div className="alert alert-success text-center position-fixed top-0 start-50 translate-middle-x mt-4 shadow-lg" style={{zIndex: 1050}}>
             ✓ Comanda a fost plasată cu succes!
           </div>
         )}
@@ -91,12 +130,15 @@ const AdminDashboard = () => {
           >
             <div
               className="bg-white h-100 position-fixed end-0 p-4 shadow-lg"
-              style={{ width: "350px" }}
+              style={{ width: "350px", overflowY: "auto" }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold">Coșul tău</h4>
-                <button className="btn-close" onClick={() => setShowCart(false)}></button>
+                <button
+                  className="btn-close"
+                  onClick={() => setShowCart(false)}
+                ></button>
               </div>
 
               {cart.length === 0 ? (
@@ -107,24 +149,30 @@ const AdminDashboard = () => {
               ) : (
                 <>
                   {cart.map((item) => (
-                    <div key={item.id} className="d-flex align-items-center mb-3 bg-light p-2 rounded">
-                      <div style={{ fontSize: "40px" }}>{item.image}</div>
+                    <div
+                      key={item.idCafea}
+                      className="d-flex align-items-center mb-3 bg-light p-2 rounded"
+                    >
+                      <div style={{ fontSize: "30px" }}>☕</div>
                       <div className="ms-3 flex-grow-1">
-                        <h6 className="fw-bold">{item.name}</h6>
-                        <span className="text-warning fw-bold">{item.price} RON</span>
+                        {/* Aici afișăm denumirea din DB */}
+                        <h6 className="fw-bold">{item.denumire}</h6>
+                        <span className="text-warning fw-bold">
+                          {item.pret} RON
+                        </span>
                       </div>
 
                       <div className="d-flex align-items-center gap-2">
                         <button
                           className="btn btn-outline-secondary btn-sm"
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() => updateQuantity(item.idCafea, -1)}
                         >
                           −
                         </button>
                         <strong>{item.quantity}</strong>
                         <button
                           className="btn btn-outline-secondary btn-sm"
-                          onClick={() => updateQuantity(item.id, 1)}
+                          onClick={() => updateQuantity(item.idCafea, 1)}
                         >
                           +
                         </button>
@@ -132,7 +180,7 @@ const AdminDashboard = () => {
 
                       <button
                         className="btn btn-link text-danger fs-4"
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(item.idCafea)}
                       >
                         🗑️
                       </button>
@@ -145,7 +193,10 @@ const AdminDashboard = () => {
                       <span className="text-success">{getTotalPrice()} RON</span>
                     </div>
 
-                    <button className="btn btn-success w-100 py-2" onClick={placeOrder}>
+                    <button
+                      className="btn btn-success w-100 py-2"
+                      onClick={placeOrder}
+                    >
                       💳 Plasează comanda
                     </button>
                   </div>
@@ -156,22 +207,44 @@ const AdminDashboard = () => {
         )}
 
         {/* Product grid */}
-        <h2 className="fw-bold mb-4">Meniul nostru</h2>
+        <h2 className="fw-bold mb-2">Meniul nostru</h2>
+
+        <div className="mb-5 d-flex justify-content-end">
+          {/* Buton Adaugă ANGAJAT */}
+          {/* <Link to="/adaugare-angajat" className="btn btn-primary btn-lg shadow fw-bold me-2">
+            👤 Adaugă Angajat
+          </Link> */}
+          {/* Acest buton te duce la ruta definită în App.js */}
+          <Link to="/adaugare-cafea" className="btn btn-success btn-lg shadow fw-bold">
+            ➕ Adaugă Cafea Nouă
+          </Link>
+        </div>
+
 
         <div className="row g-4">
           {coffees.map((coffee) => (
-            <div className="col-12 col-md-6 col-lg-4" key={coffee.id}>
+            <div className="col-12 col-md-6 col-lg-4" key={coffee.idCafea}>
               <div className="card shadow-sm h-100">
                 <div className="text-center p-5 bg-warning bg-opacity-25">
-                  <span style={{ fontSize: "80px" }}>{coffee.image}</span>
+                  <span style={{ fontSize: "80px" }}></span>
                 </div>
-                <div className="card-body">
-                  <h5 className="card-title fw-bold">{coffee.name}</h5>
-                  <p className="text-muted">{coffee.description}</p>
+                <div className="card-body d-flex flex-column">
+                  {/* Mapare date din DB */}
+                  <h5 className="card-title fw-bold">{coffee.denumire}</h5>
+                  
+                  {/* Construim descrierea din coloanele disponibile */}
+                  <p className="text-muted small">
+                    {coffee.tipBoaba} | Origine: {coffee.origine} <br/>
+                    Prăjire: {coffee.gradulDePrajire} <br/>
+                    Cantitate: {coffee.dimensiune}
+                  </p>
 
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="text-warning fw-bold">{coffee.price} RON</h4>
-                    <button className="btn btn-warning" onClick={() => addToCart(coffee)}>
+                  <div className="mt-auto d-flex justify-content-between align-items-center">
+                    <h4 className="text-warning fw-bold">{coffee.pret} RON</h4>
+                    <button
+                      className="btn btn-warning"
+                      onClick={() => addToCart(coffee)}
+                    >
                       + Adaugă
                     </button>
                   </div>

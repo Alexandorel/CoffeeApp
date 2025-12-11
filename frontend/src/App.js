@@ -3,6 +3,7 @@ import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import EmployeeDashboard from './elements/EmployeeDashboard'
 import AdminDashboard from './elements/AdminDashboard'
+import AddCoffeeForm from "./elements/AddCoffeeForm"
 import Create from './elements/Create'
 import Edit from './elements/Edit'
 import Read from './elements/Read'
@@ -21,6 +22,7 @@ function App(){
         <Route path="/create" element={<Create />} />
         <Route path="/edit/:id" element={<Edit />} />
         <Route path="/read:/id" element={<Read />} />
+        <Route path="/adaugare-cafea" element={<AddCoffeeForm />}/>
       </Routes>
     </BrowserRouter>
   )
