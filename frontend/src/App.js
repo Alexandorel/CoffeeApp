@@ -3,10 +3,9 @@ import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import EmployeeDashboard from './elements/EmployeeDashboard'
 import AdminDashboard from './elements/AdminDashboard'
-import AddCoffeeForm from "./elements/AddCoffeeForm"
-import Create from './elements/Create'
-import Edit from './elements/Edit'
-import Read from './elements/Read'
+import AddCoffeeForm from './elements/AddCoffeeForm'
+import AddEmployeeForm from './elements/AddEmployeeForm'
+import ManageEmployees from "./elements/ManageEmployees";
 import Login from './elements/Login'
 
 
@@ -19,10 +18,10 @@ function App(){
         <Route path="/logare" element={<Login />} />
         <Route path="/employeeDashboard" element={<EmployeeDashboard />} />
         <Route path="/adminDashboard" element={<AdminDashboard />} />
-        <Route path="/create" element={<Create />} />
-        <Route path="/edit/:id" element={<Edit />} />
-        <Route path="/read:/id" element={<Read />} />
         <Route path="/adaugare-cafea" element={<AddCoffeeForm />}/>
+        <Route path="/adaugare-angajat" element={<AddEmployeeForm />} />
+        <Route path="/gestionare-angajati" element={<ManageEmployees />} />
+        
       </Routes>
     </BrowserRouter>
   )

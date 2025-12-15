@@ -16,7 +16,7 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "cafenea"
+    database: "cafenea2.0"
 });
 
 db.connect((err) => {
@@ -63,16 +63,36 @@ app.post('/logare', (req, res) => {
 
 //ruta pentru extragerea cafelelor din baza de date
 app.get('/cafele', (req, res) => {
-    const sql = "SELECT * FROM Cafea";
-    db.query(sql, (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
+    // Folosim JOIN pentru a aduce Stocul (din Produs) si Numele Furnizorului (din Furnizor)
+    // LEFT JOIN e important: daca o cafea nu are furnizor setat, vrem totusi sa apara in lista (cu furnizor NULL)
+    const sql = `
+        SELECT 
+            c.idCafea,
+            c.idProdus,
+            c.denumire,
+            c.tipBoaba,
+            c.origine,
+            c.gradulDePrajire,
+            c.pret,
+            p.stoc,                -- Aici luam stocul din tabelul Parinte
+            f.nume AS numeFurnizor -- Aici luam numele furnizorului si ii dam un alias
+        FROM Cafea c
+        JOIN Produs p ON c.idProdus = p.idProdus
+        LEFT JOIN ProdusFurnizor pf ON p.idProdus = pf.idProdus
+        LEFT JOIN Furnizor f ON pf.idFurnizor = f.idFurnizor
+    `;
+
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error("Eroare la preluarea cafelelor:", err);
+            return res.status(500).send("Eroare server");
+        }
+        res.json(result);
     });
 });
 
 //ruta pentru extragerea furnizorilor
 app.get('/furnizori', (req, res) => {
-    // Folosește * ca să iei toate coloanele exact cum sunt în baza de date
     const sql = "SELECT * FROM Furnizor"; 
     
     db.query(sql, (err, data) => {
@@ -82,9 +102,8 @@ app.get('/furnizori', (req, res) => {
 });
 
 //ruta pentru adaugare cafea
-// Ruta pentru adaugare cafea (FĂRĂ DIMENSIUNE)
+// Ruta pentru adaugare cafea
 app.post('/adauga-cafea', (req, res) => {
-    // 1. Extragem datele (Am scos 'dimensiune' de aici)
     const { nume, tipBoaba, origine, prajire, pret, stoc, idFurnizor } = req.body;
 
     console.log("Date primite pentru adăugare:", req.body);
@@ -111,7 +130,7 @@ app.post('/adauga-cafea', (req, res) => {
         // ATENȚIE: Am șters coloana 'Dimensiune' și valoarea ei din acest query
         const sqlCafea = "INSERT INTO Cafea (Denumire, TipBoaba, Origine, GradulDePrajire, Pret, idProdus) VALUES (?, ?, ?, ?, ?, ?)";
         
-        db.query(sqlCafea, [nume, tipBoaba, origine, prajire, pret, idProdusNou], (err, result) => {
+        db.query(sqlCafea, [nume, tipBoaba, origine, prajire, pret, idProdusNou, idFurnizor], (err, result) => {
             if (err) {
                 console.error("❌ Eroare la inserare Cafea:", err);
                 return res.status(500).json({ error: "Eroare SQL Cafea" });
@@ -130,6 +149,39 @@ app.post('/adauga-cafea', (req, res) => {
                 return res.json({ message: "Produs adăugat cu succes!" });
             });
         });
+    });
+});
+
+app.get('/angajati', (req, res) => {
+    const sql = "SELECT * FROM Angajat";
+    db.query(sql, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    });
+});
+
+// Ruta pentru adaugare angajati
+app.post('/adauga-angajat', (req, res) => {
+    const { email, password, nume, prenume, rol, functie, dataAngajarii } = req.body;
+
+    const sql = "INSERT INTO Angajat (email, password, nume, prenume, rol, functie, dataAngajarii) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    
+    db.query(sql, [email, password, nume, prenume, rol, functie, dataAngajarii], (err, result) => {
+        if (err) {
+            console.error("Eroare inserare angajat:", err);
+            return res.status(500).json(err);
+        }
+        res.json({ message: "Angajat adăugat cu succes!" });
+    });
+});
+
+app.delete('/angajati/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "DELETE FROM Angajat WHERE idAngajat = ?";
+    
+    db.query(sql, [id], (err, data) => {
+        if (err) return res.json(err);
+        return res.json("Angajat șters cu succes!");
     });
 });
 

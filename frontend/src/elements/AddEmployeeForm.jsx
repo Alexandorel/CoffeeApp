@@ -22,10 +22,10 @@ const AddEmployeeForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios.post("http://localhost:8000/adauga-angajat", formData)
+    axios.post("/adauga-angajat", formData)
       .then(() => {
         alert("Angajat adăugat cu succes! ✅");
-        navigate("/"); // Te întoarce la Dashboard
+        navigate("/gestionare-angajati"); // Te întoarce la Dashboard
       })
       .catch((err) => {
         console.error(err);
@@ -80,7 +80,7 @@ const AddEmployeeForm = () => {
           </div>
 
           <div className="d-flex gap-3">
-            <button type="button" className="btn btn-secondary w-50" onClick={() => navigate("/")}>
+            <button type="button" className="btn btn-secondary w-50" onClick={() => navigate("/gestionare-angajati")}>
               ⬅️ Înapoi
             </button>
             <button type="submit" className="btn btn-primary w-50 fw-bold">

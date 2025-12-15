@@ -22,7 +22,7 @@ function Login() {
       localStorage.setItem('role', JSON.stringify(rolUser));
 
       setError('');
-      if(rolUser == 'admin') navigate('/adminDashboard')
+      if(rolUser === 'admin') navigate('/adminDashboard')
       else navigate('/employeeDashboard');
     } catch (err) {
       console.error('Eroare login:', err.response?.data);

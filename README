@@ -12,6 +12,9 @@
 // *Pentru frontend:
 //     ->terminal ->cd frontend->npm start
 
+// Accesare baza de date MySql:
+// http://localhost/phpmyadmin/
+
 // Observatii:
 // * entitate "dimensiune" in tabela "cafea" avand optiunile: mica, medie, mare  ✔
 // * adaugare entitate "email" si "parola" in tabela "angajat" ✔
