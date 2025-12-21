@@ -185,6 +185,38 @@ app.delete('/angajati/:id', (req, res) => {
     });
 });
 
+// Ruta pentru plasarea comenzii
+app.post('/comenzi', (req, res) => {
+  const { idAngajat, total, metodaDePlata, produse } = req.body;
+
+  if (!idAngajat || !total || !metodaDePlata || !produse || !produse.length) {
+    return res.status(400).json({ message: "Date incomplete pentru comanda" });
+  }
+
+  const sqlComanda = "INSERT INTO Comenzi (idAngajat, total, metodaDePlata, dataComenzii) VALUES (?, ?, ?, NOW())";
+  db.query(sqlComanda, [idAngajat, total, metodaDePlata], (err, result) => {
+    if (err) {
+      console.error("Eroare inserare comanda:", err);
+      return res.status(500).json({ message: "Eroare la inserarea comenzii" });
+    }
+
+    const idComandaNoua = result.insertId;
+
+    const sqlDetalii = "INSERT INTO DetaliiComanda (idComanda, idCafea, cantitate, pretUnitar) VALUES ?";
+    const values = produse.map(p => [idComandaNoua, p.idCafea, p.cantitate, p.pret]);
+
+    db.query(sqlDetalii, [values], (err2) => {
+      if (err2) {
+        console.error("Eroare inserare detalii comanda:", err2);
+        return res.status(500).json({ message: "Eroare la inserarea detaliilor comenzii" });
+      }
+
+      res.json({ message: "Comanda plasata cu succes!", idComanda: idComandaNoua });
+    });
+  });
+});
+
+
 // Pornire server
 app.listen(port, () => {
     console.log(`Server ascultă pe portul ${port}`);
