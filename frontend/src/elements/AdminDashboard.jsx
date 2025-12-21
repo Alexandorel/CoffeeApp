@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   // Preluare cafele din backend
   useEffect(() => {
     axios
-      .get("http://localhost:8000/cafele")
+      .get("/cafele")
       .then((res) => {
         setCoffees(res.data);
       })
@@ -58,6 +58,17 @@ const AdminDashboard = () => {
     
   const placeOrder = () => {
     if (cart.length === 0) return;
+
+    const produseComandate = cart.map(item => ({
+        idProdus: item.idProdus,
+        cantitate: item.quantity,
+        pret: item.pret,
+        denumire: item.denumire
+    }));
+
+    axios
+    .post('/adaugare-comanda')
+
     console.log("Comanda plasata:", cart);
     setOrderPlaced(true);
     setTimeout(() => {

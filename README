@@ -16,15 +16,7 @@
 // http://localhost/phpmyadmin/
 
 // Observatii:
-// * entitate "dimensiune" in tabela "cafea" avand optiunile: mica, medie, mare  ✔
-// * adaugare entitate "email" si "parola" in tabela "angajat" ✔
-// * 10 dec 2025:
-// * adaugare entitate "rol" in tabela "angajat"  ✔
-// * vor exista 2 rol uri: 
-//      'admin' pentru administrator
-//      'angajat' pentru angajat
-// 
-// OBSERVATII:
+// Sa notez in documentatie redenumirea tabelei 'Comanda' in 'Comenzi'.
 // 
 // 
 // 
@@ -34,5 +26,6 @@
 // 
 // 
 // 
-// 
-// 
+// Cod
+// CONSTRAINT `fk_detalii_cafea` FOREIGN KEY (`idCafea`) REFERENCES `Cafea` (`idCafea`) ON DELETE CASCADE ON UPDATE CASCADE,
+// CONSTRAINT `fk_detalii_comanda` FOREIGN KEY (`idComanda`) REFERENCES `comenzi` (`idComanda`)

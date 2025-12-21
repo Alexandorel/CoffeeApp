@@ -78,7 +78,7 @@ app.get('/cafele', (req, res) => {
             f.nume AS numeFurnizor -- Aici luam numele furnizorului si ii dam un alias
         FROM Cafea c
         JOIN Produs p ON c.idProdus = p.idProdus
-        LEFT JOIN ProdusFurnizor pf ON p.idProdus = pf.idProdus
+        LEFT JOIN ProdusFurnizor pf ON p.idProdus = pf.idProdus 
         LEFT JOIN Furnizor f ON pf.idFurnizor = f.idFurnizor
     `;
 
@@ -88,16 +88,6 @@ app.get('/cafele', (req, res) => {
             return res.status(500).send("Eroare server");
         }
         res.json(result);
-    });
-});
-
-//ruta pentru extragerea furnizorilor
-app.get('/furnizori', (req, res) => {
-    const sql = "SELECT * FROM Furnizor"; 
-    
-    db.query(sql, (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
     });
 });
 
@@ -149,6 +139,16 @@ app.post('/adauga-cafea', (req, res) => {
                 return res.json({ message: "Produs adăugat cu succes!" });
             });
         });
+    });
+});
+
+//ruta pentru extragerea furnizorilor
+app.get('/furnizori', (req, res) => {
+    const sql = "SELECT * FROM Furnizor"; 
+    
+    db.query(sql, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
     });
 });
 
