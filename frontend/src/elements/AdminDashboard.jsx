@@ -10,6 +10,7 @@ const AdminDashboard = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [searchTerm, setSearchTerm] = useState("");
+  
 
 
   const navigate = useNavigate();
@@ -108,6 +109,10 @@ const AdminDashboard = () => {
       navigate(`/editare-cafea/${selectedCoffee.idProdus}`);
     }
   };
+
+  const filteredCoffees = coffees.filter((coffee) =>
+  coffee.denumire.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-vh-100 bg-light d-flex flex-column position-relative">
@@ -253,37 +258,48 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="row g-3">
-              {coffees.map((coffee) => (
-                <div className="col-12 col-sm-6 col-lg-4 col-xl-3" key={coffee.idCafea}>
-                  <div
-                    className="card shadow-sm h-100 border-0 position-relative"
-                    style={{ cursor: "pointer", transition: "transform 0.2s" }}
-                    onClick={() => addToCart(coffee)}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                  >
-                    <button
-                      className="btn btn-light btn-sm position-absolute top-0 end-0 m-2 shadow-sm rounded-circle border"
-                      style={{ width: "32px", height: "32px", zIndex: 10 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCoffee(coffee);
-                      }}
-                      title="Vezi detalii si editeaza"
-                    >
-                      ℹ
-                    </button>
-                    <div className="text-center p-3 bg-warning bg-opacity-10">
-                      <span style={{ fontSize: "50px" }}></span>
-                    </div>
-                    <div className="card-body p-3 text-center">
-                      <h6 className="card-title fw-bold mb-1">{coffee.denumire}</h6>
-                      <small className="text-muted d-block mb-2">{coffee.dimensiune || "Standard"}</small>
-                      <h5 className="text-primary fw-bold mb-0">{coffee.pret} RON</h5>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <div className="row g-3">
+  {filteredCoffees.map((coffee) => (
+    <div className="col-12 col-sm-6 col-lg-4 col-xl-3" key={coffee.idCafea}>
+      <div
+        className="card shadow-sm h-100 border-0 position-relative overflow-hidden"
+        style={{ cursor: "pointer", transition: "transform 0.2s" }}
+        onClick={() => addToCart(coffee)}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
+        <button
+          className="btn btn-light btn-sm position-absolute top-0 end-0 m-2 shadow-sm rounded-circle border"
+          style={{ width: "32px", height: "32px", zIndex: 10 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedCoffee(coffee);
+          }}
+          title="Vezi detalii si editeaza"
+        >
+          ℹ
+        </button>
+
+        {/* SECȚIUNE IMAGINE DINAMICĂ */}
+        <div className="text-center bg-light" style={{ height: "150px", overflow: "hidden" }}>
+          <img 
+            src={coffee.imagine || "/imagini/default-coffee.jpg"} 
+            alt={coffee.denumire}
+            className="w-100 h-100"
+            style={{ objectFit: "cover" }}
+            onError={(e) => { e.target.src = "/imagini/default-coffee.jpg"; }} 
+          />
+        </div>
+
+        <div className="card-body p-3 text-center">
+          <h6 className="card-title fw-bold mb-1">{coffee.denumire}</h6>
+          <small className="text-muted d-block mb-2">{coffee.dimensiune || "Standard"}</small>
+          <h5 className="text-primary fw-bold mb-0">{coffee.pret} RON</h5>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
             </div>
           </div>
 
@@ -300,7 +316,7 @@ const AdminDashboard = () => {
                 </div>
               ) : (
                 cart.map((item) => (
-                  <div key={item.idCafea} className="card mb-2 border-0 shadow-sm bg-light">
+                  <div key={item.idCafea}  className="card mb-2 border-0 shadow-sm bg-light">
                     <div className="card-body p-2 d-flex align-items-center">
                       <div className="d-flex flex-column align-items-center me-3">
                         <button className="btn btn-sm btn-outline-secondary p-0 px-1" onClick={(e) => { e.stopPropagation(); updateQuantity(item.idCafea, 1); }}>▲</button>

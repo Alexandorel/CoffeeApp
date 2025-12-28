@@ -61,6 +61,51 @@ app.post('/logare', (req, res) => {
     });
 });
 
+// adaugare cafea
+app.post('/adauga-cafea', (req, res) => {
+    const { nume, tipBoaba, origine, prajire, pret, stoc, idFurnizor } = req.body;
+
+    console.log("Date primite pentru adăugare:", req.body);
+
+    if (!idFurnizor) {
+        return res.status(400).json({ error: "Lipseste idFurnizor!" });
+    }
+
+    const sqlProdus = "INSERT INTO Produs (Nume, Stoc) VALUES (?, ?)";
+    
+    db.query(sqlProdus, [nume, stoc || 0], (err, result) => {
+        if (err) {
+            console.error("Eroare la inserare Produs:", err);
+            return res.status(500).json({ error: "Eroare SQL Produs" });
+        }
+
+        const idProdusNou = result.insertId;
+        console.log("Produs creat cu ID:", idProdusNou);
+
+        const sqlCafea = "INSERT INTO Cafea (Denumire, TipBoaba, Origine, GradulDePrajire, Pret, idProdus) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        db.query(sqlCafea, [nume, tipBoaba, origine, prajire, pret, idProdusNou, idFurnizor], (err, result) => {
+            if (err) {
+                console.error("Eroare la inserare Cafea:", err);
+                return res.status(500).json({ error: "Eroare SQL Cafea" });
+            }
+
+            const sqlLink = "INSERT INTO ProdusFurnizor (idProdus, idFurnizor) VALUES (?, ?)";
+            
+            db.query(sqlLink, [idProdusNou, idFurnizor], (err, result) => {
+                if (err) {
+                    console.error("❌ Eroare la legare Furnizor:", err);
+                    return res.status(500).json({ error: "Eroare SQL Furnizor" });
+                }
+
+                console.log("Totul a functionat perfect!");
+                return res.json({ message: "Produs adaugat cu succes!" });
+            });
+        });
+    });
+});
+
+
 // interogare cafea
 app.get('/cafele', (req, res) => {
     const sql = `
@@ -72,6 +117,7 @@ app.get('/cafele', (req, res) => {
             c.origine,
             c.gradulDePrajire,
             c.pret,
+            c.imagine,
             p.stoc,                
             f.nume AS numeFurnizor
         FROM Cafea c
