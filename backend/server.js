@@ -242,6 +242,30 @@ app.put('/editare-cafea/:id', (req, res) => {
     });
 });
 
+// 15. Preluare istoric comenzi (cu detalii despre angajatul care a servit)
+app.get('/istoric-comenzi', (req, res) => {
+    const sql = `
+        SELECT 
+            c.idComanda, 
+            c.dataComenzii, 
+            c.total, 
+            c.metodaDePlata, 
+            a.nume AS numeAngajat, 
+            a.prenume AS prenumeAngajat
+        FROM Comenzi c
+        JOIN Angajat a ON c.idAngajat = a.idAngajat
+        ORDER BY c.dataComenzii DESC
+    `;
+    
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Eroare la preluarea istoricului:", err);
+            return res.status(500).json({ error: "Eroare server" });
+        }
+        res.json(results);
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server ascultă pe portul ${port}`);
 });

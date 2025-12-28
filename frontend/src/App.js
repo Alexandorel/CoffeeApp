@@ -5,6 +5,7 @@ import EmployeeDashboard from './elements/EmployeeDashboard'
 import AdminDashboard from './elements/AdminDashboard'
 import AddCoffeeForm from './elements/AddCoffeeForm'
 import EditCoffee from './elements/EditCoffee'
+import OrderHistory from './elements/OrderHistory';
 import AddEmployeeForm from './elements/AddEmployeeForm'
 import ManageEmployees from "./elements/ManageEmployees";
 import Login from './elements/Login'
@@ -23,6 +24,7 @@ function App(){
         <Route path="/adaugare-angajat" element={<AddEmployeeForm />} />
         <Route path="/gestionare-angajati" element={<ManageEmployees />} />
         <Route path="/editare-cafea/:id" element={<EditCoffee />} />
+        <Route path="/istoric" element={<OrderHistory />} />
         
       </Routes>
     </BrowserRouter>

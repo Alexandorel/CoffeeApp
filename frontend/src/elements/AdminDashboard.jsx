@@ -199,6 +199,7 @@ const AdminDashboard = () => {
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fw-bold text-dark">Meniu Cafea</h3>
               <div className="d-flex gap-2">
+                <Link to="/istoric" className="btn btn-primary text-white fw-bold shadow-sm">📜 Istoric Comenzi</Link>
                 <Link to="/gestionare-angajati" className="btn btn-info text-white fw-bold shadow-sm">Angajati</Link>
                 <Link to="/adaugare-cafea" className="btn btn-success fw-bold shadow-sm">➕ Produs Nou</Link>
               </div>
