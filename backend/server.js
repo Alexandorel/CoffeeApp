@@ -11,7 +11,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.use(express.json());
 
-// Conexiunea la MySQL
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -26,7 +25,8 @@ db.connect((err) => {
         console.log("Conexiunea la baza de date reușită!");
     }
 });
-// Ruta pentru login
+
+// 1
 app.post('/logare', (req, res) => {
     const { email, password } = req.body;
 
@@ -61,10 +61,9 @@ app.post('/logare', (req, res) => {
     });
 });
 
-//ruta pentru extragerea cafelelor din baza de date
+// 2
+//Extragere cafea din BD
 app.get('/cafele', (req, res) => {
-    // Folosim JOIN pentru a aduce Stocul (din Produs) si Numele Furnizorului (din Furnizor)
-    // LEFT JOIN e important: daca o cafea nu are furnizor setat, vrem totusi sa apara in lista (cu furnizor NULL)
     const sql = `
         SELECT 
             c.idCafea,
@@ -74,8 +73,8 @@ app.get('/cafele', (req, res) => {
             c.origine,
             c.gradulDePrajire,
             c.pret,
-            p.stoc,                -- Aici luam stocul din tabelul Parinte
-            f.nume AS numeFurnizor -- Aici luam numele furnizorului si ii dam un alias
+            p.stoc,                
+            f.nume AS numeFurnizor
         FROM Cafea c
         JOIN Produs p ON c.idProdus = p.idProdus
         LEFT JOIN ProdusFurnizor pf ON p.idProdus = pf.idProdus 
@@ -91,42 +90,35 @@ app.get('/cafele', (req, res) => {
     });
 });
 
-//ruta pentru adaugare cafea
-// Ruta pentru adaugare cafea
+// 3
 app.post('/adauga-cafea', (req, res) => {
     const { nume, tipBoaba, origine, prajire, pret, stoc, idFurnizor } = req.body;
 
     console.log("Date primite pentru adăugare:", req.body);
 
-    // Validare minimală
     if (!idFurnizor) {
-        return res.status(400).json({ error: "Lipsește idFurnizor!" });
+        return res.status(400).json({ error: "Lipseste idFurnizor!" });
     }
 
-    // PASUL A: Creăm PRODUSUL generic (Tabela Părinte)
-    // Aici se generează ID-ul unic (idProdus)
     const sqlProdus = "INSERT INTO Produs (Nume, Stoc) VALUES (?, ?)";
     
     db.query(sqlProdus, [nume, stoc || 0], (err, result) => {
         if (err) {
-            console.error("❌ Eroare la inserare Produs:", err);
+            console.error("Eroare la inserare Produs:", err);
             return res.status(500).json({ error: "Eroare SQL Produs" });
         }
 
-        const idProdusNou = result.insertId; // ID-ul generat automat (ex: 106)
-        console.log("✅ Produs creat cu ID:", idProdusNou);
+        const idProdusNou = result.insertId;
+        console.log("Produs creat cu ID:", idProdusNou);
 
-        // PASUL B: Creăm CAFEAUA (Tabela Copil)
-        // ATENȚIE: Am șters coloana 'Dimensiune' și valoarea ei din acest query
         const sqlCafea = "INSERT INTO Cafea (Denumire, TipBoaba, Origine, GradulDePrajire, Pret, idProdus) VALUES (?, ?, ?, ?, ?, ?)";
         
         db.query(sqlCafea, [nume, tipBoaba, origine, prajire, pret, idProdusNou, idFurnizor], (err, result) => {
             if (err) {
-                console.error("❌ Eroare la inserare Cafea:", err);
+                console.error("Eroare la inserare Cafea:", err);
                 return res.status(500).json({ error: "Eroare SQL Cafea" });
             }
 
-            // PASUL C: Facem legătura cu FURNIZORUL
             const sqlLink = "INSERT INTO ProdusFurnizor (idProdus, idFurnizor) VALUES (?, ?)";
             
             db.query(sqlLink, [idProdusNou, idFurnizor], (err, result) => {
@@ -135,14 +127,14 @@ app.post('/adauga-cafea', (req, res) => {
                     return res.status(500).json({ error: "Eroare SQL Furnizor" });
                 }
 
-                console.log("✅ Totul a funcționat perfect!");
-                return res.json({ message: "Produs adăugat cu succes!" });
+                console.log("Totul a functionat perfect!");
+                return res.json({ message: "Produs adaugat cu succes!" });
             });
         });
     });
 });
 
-//ruta pentru extragerea furnizorilor
+// 4
 app.get('/furnizori', (req, res) => {
     const sql = "SELECT * FROM Furnizor"; 
     
@@ -152,6 +144,7 @@ app.get('/furnizori', (req, res) => {
     });
 });
 
+// 5
 app.get('/angajati', (req, res) => {
     const sql = "SELECT * FROM Angajat";
     db.query(sql, (err, data) => {
@@ -160,7 +153,7 @@ app.get('/angajati', (req, res) => {
     });
 });
 
-// Ruta pentru adaugare angajati
+// 6
 app.post('/adauga-angajat', (req, res) => {
     const { email, password, nume, prenume, rol, functie, dataAngajarii } = req.body;
 
@@ -175,6 +168,7 @@ app.post('/adauga-angajat', (req, res) => {
     });
 });
 
+// 7
 app.delete('/angajati/:id', (req, res) => {
     const id = req.params.id;
     const sql = "DELETE FROM Angajat WHERE idAngajat = ?";
@@ -185,7 +179,8 @@ app.delete('/angajati/:id', (req, res) => {
     });
 });
 
-// Ruta pentru plasarea comenzii
+// 8
+// Plasare comanda
 app.post('/comenzi', (req, res) => {
   const { idAngajat, total, metodaDePlata, produse } = req.body;
 
@@ -216,8 +211,37 @@ app.post('/comenzi', (req, res) => {
   });
 });
 
+// Query pentru preluarea datelor unei singure cafele (pentru a popula formularul de editare)
+app.get('/cafele/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT c.*, p.stoc FROM Cafea c JOIN Produs p ON c.idProdus = p.idProdus WHERE c.idProdus = ?";
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json(result[0]);
+    });
+});
 
-// Pornire server
+// Query pentru SALVAREA modificărilor
+app.put('/editare-cafea/:id', (req, res) => {
+    const idProdus = req.params.id;
+    const { denumire, tipBoaba, origine, gradulDePrajire, pret, stoc } = req.body;
+
+    // 1. Update în tabela Produs (Nume și Stoc)
+    const sqlProdus = "UPDATE Produs SET Nume = ?, Stoc = ? WHERE idProdus = ?";
+    
+    db.query(sqlProdus, [denumire, stoc, idProdus], (err, result) => {
+        if (err) return res.status(500).json({ error: "Eroare la update Produs" });
+
+        // 2. Update în tabela Cafea
+        const sqlCafea = "UPDATE Cafea SET Denumire = ?, TipBoaba = ?, Origine = ?, GradulDePrajire = ?, Pret = ? WHERE idProdus = ?";
+        
+        db.query(sqlCafea, [denumire, tipBoaba, origine, gradulDePrajire, pret, idProdus], (err2) => {
+            if (err2) return res.status(500).json({ error: "Eroare la update Cafea" });
+            res.json({ message: "Produs actualizat cu succes!" });
+        });
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server ascultă pe portul ${port}`);
 });

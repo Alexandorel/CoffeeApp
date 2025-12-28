@@ -18,13 +18,9 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     axios
-      .get("/cafele")
-      .then((res) => {
-        setCoffees(res.data);
-      })
-      .catch((err) =>
-        console.error("Eroare la preluarea cafelelor:", err)
-      );
+      .get("http://localhost:8000/cafele")
+      .then((res) => setCoffees(res.data))
+      .catch((err) => console.error("Eroare la preluarea cafelelor:", err));
   }, []);
 
   const addToCart = (coffee) => {
@@ -62,15 +58,40 @@ const AdminDashboard = () => {
   // Deschide modalul de plată
   const handlePlaceOrder = () => {
     if (cart.length === 0) return;
-    console.log("Comanda plasata:", cart);
-    setOrderPlaced(true);
-    setTimeout(() => {
-      setCart([]);
-      setOrderPlaced(false);
-    }, 3000);
+    setShowPaymentModal(true);
   };
 
-  // Functie pentru navigare la editare
+  // Confirmă comanda cu metoda de plată
+  const confirmOrder = async () => {
+    // 1. Încercăm ambele variante de structură pentru siguranță
+    const realAngajatId = user?.idAngajat || user?.angajat?.idAngajat;
+
+    console.log("ID Angajat trimis:", realAngajatId); // Verifică în consola browserului dacă apare un număr!
+
+    if (!realAngajatId) {
+        alert("Eroare: Nu s-a putut identifica angajatul. Te rugăm să te reconectezi.");
+        return;
+    }
+
+    const orderData = {
+        idAngajat: realAngajatId, // Folosim ID-ul corectat
+        total: parseFloat(getTotalPrice()),
+        metodaDePlata: paymentMethod,
+        produse: cart.map((item) => ({
+            idCafea: item.idCafea,
+            cantitate: item.quantity,
+            pret: item.pret,
+        })),
+    };
+
+    try {
+        const res = await axios.post("http://localhost:8000/comenzi", orderData);
+        // ... restul codului
+    } catch (err) {
+        console.error("Eroare la plasarea comenzii:", err);
+    }
+};
+
   const handleEdit = () => {
     if (selectedCoffee) {
       navigate(`/editare-cafea/${selectedCoffee.idProdus}`);
@@ -268,7 +289,7 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
-  );
+  );      
 };
 
 export default AdminDashboard;
