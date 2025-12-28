@@ -1,6 +1,7 @@
 import React from 'react'
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import EmployeeDashboard from './elements/EmployeeDashboard'
 import AdminDashboard from './elements/AdminDashboard'
 import AddCoffeeForm from './elements/AddCoffeeForm'

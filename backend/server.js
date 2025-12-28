@@ -26,7 +26,7 @@ db.connect((err) => {
     }
 });
 
-// 1
+// logare
 app.post('/logare', (req, res) => {
     const { email, password } = req.body;
 
@@ -61,8 +61,7 @@ app.post('/logare', (req, res) => {
     });
 });
 
-// 2
-//Extragere cafea din BD
+// interogare cafea
 app.get('/cafele', (req, res) => {
     const sql = `
         SELECT 
@@ -90,51 +89,46 @@ app.get('/cafele', (req, res) => {
     });
 });
 
-// 3
-app.post('/adauga-cafea', (req, res) => {
-    const { nume, tipBoaba, origine, prajire, pret, stoc, idFurnizor } = req.body;
+// plasare comanda, actualizare stoc
+app.post("/comenzi", (req, res) => {
+  const { idAngajat, total, metodaDePlata, produse } = req.body;
 
-    console.log("Date primite pentru adăugare:", req.body);
+  // inserare in tabela 'Comenzi'
+  const sqlComanda = "INSERT INTO Comenzi (idAngajat, total, metodaDePlata, dataComenzii) VALUES (?, ?, ?, NOW())";
 
-    if (!idFurnizor) {
-        return res.status(400).json({ error: "Lipseste idFurnizor!" });
+  db.query(sqlComanda, [idAngajat, total, metodaDePlata], (err, result) => {
+    if (err) {
+      console.error("Eroare la inserarea comenzii:", err);
+      return res.status(500).json({ error: "Eroare server la crearea comenzii" });
     }
 
-    const sqlProdus = "INSERT INTO Produs (Nume, Stoc) VALUES (?, ?)";
-    
-    db.query(sqlProdus, [nume, stoc || 0], (err, result) => {
-        if (err) {
-            console.error("Eroare la inserare Produs:", err);
-            return res.status(500).json({ error: "Eroare SQL Produs" });
-        }
+    const idComanda = result.insertId;
 
-        const idProdusNou = result.insertId;
-        console.log("Produs creat cu ID:", idProdusNou);
+    // pentru fiecare produs din lista, inserare detalii, reducere stoc
+    produse.forEach((produs) => {
+      // inserare în tabela 'DetaliiComanda'
+      const sqlDetalii = "INSERT INTO DetaliiComanda (idComanda, idCafea, cantitate, pretUnitar) VALUES (?, ?, ?, ?)";
+      db.query(sqlDetalii, [idComanda, produs.idCafea, produs.cantitate, produs.pret], (errDet) => {
+        if (errDet) console.error("Eroare la detalii comanda:", errDet);
 
-        const sqlCafea = "INSERT INTO Cafea (Denumire, TipBoaba, Origine, GradulDePrajire, Pret, idProdus) VALUES (?, ?, ?, ?, ?, ?)";
-        
-        db.query(sqlCafea, [nume, tipBoaba, origine, prajire, pret, idProdusNou, idFurnizor], (err, result) => {
-            if (err) {
-                console.error("Eroare la inserare Cafea:", err);
-                return res.status(500).json({ error: "Eroare SQL Cafea" });
-            }
+        // reducere stoc
+        const sqlUpdateStoc = `
+          UPDATE Produs 
+          SET Stoc = Stoc - ? 
+          WHERE idProdus = (SELECT idProdus FROM Cafea WHERE idCafea = ?)
+        `;
 
-            const sqlLink = "INSERT INTO ProdusFurnizor (idProdus, idFurnizor) VALUES (?, ?)";
-            
-            db.query(sqlLink, [idProdusNou, idFurnizor], (err, result) => {
-                if (err) {
-                    console.error("❌ Eroare la legare Furnizor:", err);
-                    return res.status(500).json({ error: "Eroare SQL Furnizor" });
-                }
-
-                console.log("Totul a functionat perfect!");
-                return res.json({ message: "Produs adaugat cu succes!" });
-            });
+        db.query(sqlUpdateStoc, [produs.cantitate, produs.idCafea], (errStoc) => {
+          if (errStoc) console.error("Eroare la actualizarea stocului:", errStoc);
         });
+      });
     });
+
+    res.json({ message: "Comandă plasată cu succes și stoc actualizat!", idComanda });
+  });
 });
 
-// 4
+// afisare furnizori
 app.get('/furnizori', (req, res) => {
     const sql = "SELECT * FROM Furnizor"; 
     
@@ -144,7 +138,7 @@ app.get('/furnizori', (req, res) => {
     });
 });
 
-// 5
+// afisare angajati
 app.get('/angajati', (req, res) => {
     const sql = "SELECT * FROM Angajat";
     db.query(sql, (err, data) => {
@@ -153,7 +147,7 @@ app.get('/angajati', (req, res) => {
     });
 });
 
-// 6
+// adaugare angajati
 app.post('/adauga-angajat', (req, res) => {
     const { email, password, nume, prenume, rol, functie, dataAngajarii } = req.body;
 
@@ -168,7 +162,7 @@ app.post('/adauga-angajat', (req, res) => {
     });
 });
 
-// 7
+// stergere angajati
 app.delete('/angajati/:id', (req, res) => {
     const id = req.params.id;
     const sql = "DELETE FROM Angajat WHERE idAngajat = ?";
@@ -179,7 +173,6 @@ app.delete('/angajati/:id', (req, res) => {
     });
 });
 
-// 8
 // Plasare comanda
 app.post('/comenzi', (req, res) => {
   const { idAngajat, total, metodaDePlata, produse } = req.body;
@@ -211,7 +204,7 @@ app.post('/comenzi', (req, res) => {
   });
 });
 
-// Query pentru preluarea datelor unei singure cafele (pentru a popula formularul de editare)
+// interogare cafea individuala pentru modificare
 app.get('/cafele/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT c.*, p.stoc FROM Cafea c JOIN Produs p ON c.idProdus = p.idProdus WHERE c.idProdus = ?";
@@ -221,18 +214,16 @@ app.get('/cafele/:id', (req, res) => {
     });
 });
 
-// Query pentru SALVAREA modificărilor
+// salvare modificari cafea
 app.put('/editare-cafea/:id', (req, res) => {
     const idProdus = req.params.id;
     const { denumire, tipBoaba, origine, gradulDePrajire, pret, stoc } = req.body;
 
-    // 1. Update în tabela Produs (Nume și Stoc)
     const sqlProdus = "UPDATE Produs SET Nume = ?, Stoc = ? WHERE idProdus = ?";
     
     db.query(sqlProdus, [denumire, stoc, idProdus], (err, result) => {
         if (err) return res.status(500).json({ error: "Eroare la update Produs" });
 
-        // 2. Update în tabela Cafea
         const sqlCafea = "UPDATE Cafea SET Denumire = ?, TipBoaba = ?, Origine = ?, GradulDePrajire = ?, Pret = ? WHERE idProdus = ?";
         
         db.query(sqlCafea, [denumire, tipBoaba, origine, gradulDePrajire, pret, idProdus], (err2) => {
@@ -242,7 +233,7 @@ app.put('/editare-cafea/:id', (req, res) => {
     });
 });
 
-// 15. Preluare istoric comenzi (cu detalii despre angajatul care a servit)
+// istoric comenzi
 app.get('/istoric-comenzi', (req, res) => {
     const sql = `
         SELECT 

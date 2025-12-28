@@ -17,15 +17,4 @@
 
 // Observatii:
 // Sa notez in documentatie redenumirea tabelei 'Comanda' in 'Comenzi'.
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// Cod
-// CONSTRAINT `fk_detalii_cafea` FOREIGN KEY (`idCafea`) REFERENCES `Cafea` (`idCafea`) ON DELETE CASCADE ON UPDATE CASCADE,
-// CONSTRAINT `fk_detalii_comanda` FOREIGN KEY (`idComanda`) REFERENCES `comenzi` (`idComanda`)
+

@@ -9,6 +9,8 @@ const AdminDashboard = () => {
   const [selectedCoffee, setSelectedCoffee] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   const navigate = useNavigate();
 
@@ -61,36 +63,45 @@ const AdminDashboard = () => {
     setShowPaymentModal(true);
   };
 
-  // Confirmă comanda cu metoda de plată
+  // Confirma comanda cu metoda de plata
   const confirmOrder = async () => {
-    // 1. Încercăm ambele variante de structură pentru siguranță
+    // 1. Încercam ambele variante de structura pentru siguranta
     const realAngajatId = user?.idAngajat || user?.angajat?.idAngajat;
 
-    console.log("ID Angajat trimis:", realAngajatId); // Verifică în consola browserului dacă apare un număr!
+    console.log("ID Angajat trimis:", realAngajatId); 
 
     if (!realAngajatId) {
-        alert("Eroare: Nu s-a putut identifica angajatul. Te rugăm să te reconectezi.");
-        return;
+      alert("Eroare: Nu s-a putut identifica angajatul. Te rugăm să te reconectezi.");
+      return;
     }
 
     const orderData = {
-        idAngajat: realAngajatId, // Folosim ID-ul corectat
-        total: parseFloat(getTotalPrice()),
-        metodaDePlata: paymentMethod,
-        produse: cart.map((item) => ({
-            idCafea: item.idCafea,
-            cantitate: item.quantity,
-            pret: item.pret,
-        })),
+      idAngajat: realAngajatId,
+      total: parseFloat(getTotalPrice()),
+      metodaDePlata: paymentMethod,
+      produse: cart.map((item) => ({
+        idCafea: item.idCafea,
+        cantitate: item.quantity,
+        pret: item.pret,
+      })),
     };
 
     try {
         const res = await axios.post("http://localhost:8000/comenzi", orderData);
-        // ... restul codului
+        
+        setOrderPlaced(true);
+        setCart([]); // Golește coșul
+        setShowPaymentModal(false);
+
+        // ACTUALIZARE VIZUALĂ: Reîncărcăm lista de cafele din baza de date
+        const freshCoffees = await axios.get("http://localhost:8000/cafele");
+        setCoffees(freshCoffees.data);
+
+        setTimeout(() => setOrderPlaced(false), 3000);
     } catch (err) {
         console.error("Eroare la plasarea comenzii:", err);
     }
-};
+  };
 
   const handleEdit = () => {
     if (selectedCoffee) {
@@ -100,7 +111,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-vh-100 bg-light d-flex flex-column position-relative">
-      {/* Modal detalii produs */}
+      {/* detalii produs */}
       {selectedCoffee && (
         <div
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
@@ -133,7 +144,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Modal plată */}
+      {/* plata */}
       {showPaymentModal && (
         <div
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
@@ -197,11 +208,48 @@ const AdminDashboard = () => {
           {/* Meniu produse */}
           <div className="col-md-8 p-4 overflow-auto" style={{ height: "calc(100vh - 70px)" }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="fw-bold text-dark">Meniu Cafea</h3>
-              <div className="d-flex gap-2">
-                <Link to="/istoric" className="btn btn-primary text-white fw-bold shadow-sm">📜 Istoric Comenzi</Link>
-                <Link to="/gestionare-angajati" className="btn btn-info text-white fw-bold shadow-sm">Angajati</Link>
-                <Link to="/adaugare-cafea" className="btn btn-success fw-bold shadow-sm">➕ Produs Nou</Link>
+              <h3 className="fw-bold text-dark">Cafea</h3>
+
+              <div className="input-group flex-grow-1 mx-4" >
+                <span className="input-group-text bg-white border-end-0">
+                </span>
+                <input
+                  type="text"
+                  className="form-control border-start-0"
+                  placeholder="Caută produs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              <div className="dropdown">
+                <button
+                  className="btn btn-dark dropdown-toggle fw-bold shadow-sm"
+                  type="button"
+                  id="adminDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Administrare
+                </button>
+                <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="adminDropdown">
+                  <li>
+                    <Link to="/adaugare-cafea" className="dropdown-item py-2">
+                      Produs Nou
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/gestionare-angajati" className="dropdown-item py-2">
+                      Gestionare Angajați
+                    </Link>
+                  </li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li>
+                    <Link to="/istoric" className="dropdown-item py-2 text-primary fw-bold">
+                      Istoric Comenzi
+                    </Link>
+                  </li>
+                </ul>
               </div>
             </div>
             <div className="row g-3">
@@ -239,10 +287,10 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Coș */}
+          {/* Cos */}
           <div className="col-md-4 bg-white border-start shadow-sm d-flex flex-column p-0" style={{ height: "calc(100vh - 70px)" }}>
             <div className="p-3 bg-light border-bottom">
-              <h4 className="fw-bold m-0">🧾 Bon Fiscal</h4>
+              <h4 className="fw-bold m-0">Bon Fiscal</h4>
             </div>
             <div className="flex-grow-1 overflow-auto p-3">
               {cart.length === 0 ? (
@@ -290,7 +338,7 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
-  );      
+  );
 };
 
 export default AdminDashboard;
