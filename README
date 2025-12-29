@@ -15,6 +15,7 @@
 // Accesare baza de date MySql:
 // http://localhost/phpmyadmin/
 
-// Observatii:
+// Observatii pentru documentatie
 // Sa notez in documentatie redenumirea tabelei 'Comanda' in 'Comenzi'.
+// Am adaugat entitatea 'imagine' in cafea pentru afisarea fiecarei cafele
 

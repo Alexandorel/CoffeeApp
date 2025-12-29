@@ -10,7 +10,10 @@ const AdminDashboard = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
+  const [showTopModal, setShowTopModal] = useState(false);
+  const [topProducts, setTopProducts] = useState([]);
+
 
 
   const navigate = useNavigate();
@@ -69,7 +72,7 @@ const AdminDashboard = () => {
     // 1. Încercam ambele variante de structura pentru siguranta
     const realAngajatId = user?.idAngajat || user?.angajat?.idAngajat;
 
-    console.log("ID Angajat trimis:", realAngajatId); 
+    console.log("ID Angajat trimis:", realAngajatId);
 
     if (!realAngajatId) {
       alert("Eroare: Nu s-a putut identifica angajatul. Te rugăm să te reconectezi.");
@@ -88,19 +91,19 @@ const AdminDashboard = () => {
     };
 
     try {
-        const res = await axios.post("http://localhost:8000/comenzi", orderData);
-        
-        setOrderPlaced(true);
-        setCart([]); // Golește coșul
-        setShowPaymentModal(false);
+      const res = await axios.post("http://localhost:8000/comenzi", orderData);
 
-        // ACTUALIZARE VIZUALĂ: Reîncărcăm lista de cafele din baza de date
-        const freshCoffees = await axios.get("http://localhost:8000/cafele");
-        setCoffees(freshCoffees.data);
+      setOrderPlaced(true);
+      setCart([]); // Golește coșul
+      setShowPaymentModal(false);
 
-        setTimeout(() => setOrderPlaced(false), 3000);
+      // ACTUALIZARE VIZUALĂ: Reîncărcăm lista de cafele din baza de date
+      const freshCoffees = await axios.get("http://localhost:8000/cafele");
+      setCoffees(freshCoffees.data);
+
+      setTimeout(() => setOrderPlaced(false), 3000);
     } catch (err) {
-        console.error("Eroare la plasarea comenzii:", err);
+      console.error("Eroare la plasarea comenzii:", err);
     }
   };
 
@@ -111,8 +114,18 @@ const AdminDashboard = () => {
   };
 
   const filteredCoffees = coffees.filter((coffee) =>
-  coffee.denumire.toLowerCase().includes(searchTerm.toLowerCase())
+    coffee.denumire.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const fetchTopProducts = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/top-vanzari");
+      setTopProducts(res.data);
+      setShowTopModal(true);
+    } catch (err) {
+      console.error("Eroare la preluarea topului:", err);
+    }
+  };
 
   return (
     <div className="min-vh-100 bg-light d-flex flex-column position-relative">
@@ -192,6 +205,45 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Modal Top Vanzari */}
+      {showTopModal && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
+          onClick={() => setShowTopModal(false)}
+        >
+          <div
+            className="bg-white p-4 rounded-4 shadow-lg border-0"
+            style={{ maxWidth: "450px", width: "90%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center mb-4">
+              <h3 className="fw-bold text-dark">  Top Vânzări</h3>
+              <p className="text-muted">Cele mai populare produse</p>
+            </div>
+
+            <div className="list-group list-group-flush mb-4">
+              {topProducts.map((p, index) => (
+                <div key={index} className="list-group-item d-flex align-items-center border-0 py-3 bg-light rounded-3 mb-2">
+                  <span className="fs-3 me-3">
+                    {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+                  </span>
+                  <div className="flex-grow-1">
+                    <h6 className="fw-bold mb-0">{p.denumire}</h6>
+                    <small className="text-muted">{p.total_vandut} unități vândute</small>
+                  </div>
+                  <span className="badge bg-primary rounded-pill">Top {index + 1}</span>
+                </div>
+              ))}
+            </div>
+
+            <button className="btn btn-dark w-100 py-2 fw-bold" onClick={() => setShowTopModal(false)}>
+              Închide
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-dark text-white py-3 shadow">
         <div className="container-fluid px-4 d-flex justify-content-between align-items-center">
@@ -248,6 +300,12 @@ const AdminDashboard = () => {
                       Gestionare Angajați
                     </Link>
                   </li>
+
+                  <li>
+                    <button className="dropdown-item py-2 text-success fw-bold" onClick={fetchTopProducts}>
+                      Top 3 Vânzări
+                    </button>
+                  </li>
                   <li><hr className="dropdown-divider" /></li>
                   <li>
                     <Link to="/istoric" className="dropdown-item py-2 text-primary fw-bold">
@@ -259,47 +317,47 @@ const AdminDashboard = () => {
             </div>
             <div className="row g-3">
               <div className="row g-3">
-  {filteredCoffees.map((coffee) => (
-    <div className="col-12 col-sm-6 col-lg-4 col-xl-3" key={coffee.idCafea}>
-      <div
-        className="card shadow-sm h-100 border-0 position-relative overflow-hidden"
-        style={{ cursor: "pointer", transition: "transform 0.2s" }}
-        onClick={() => addToCart(coffee)}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        <button
-          className="btn btn-light btn-sm position-absolute top-0 end-0 m-2 shadow-sm rounded-circle border"
-          style={{ width: "32px", height: "32px", zIndex: 10 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setSelectedCoffee(coffee);
-          }}
-          title="Vezi detalii si editeaza"
-        >
-          ℹ
-        </button>
+                {filteredCoffees.map((coffee) => (
+                  <div className="col-12 col-sm-6 col-lg-4 col-xl-3" key={coffee.idCafea}>
+                    <div
+                      className="card shadow-sm h-100 border-0 position-relative overflow-hidden"
+                      style={{ cursor: "pointer", transition: "transform 0.2s" }}
+                      onClick={() => addToCart(coffee)}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                    >
+                      <button
+                        className="btn btn-light btn-sm position-absolute top-0 end-0 m-2 shadow-sm rounded-circle border"
+                        style={{ width: "32px", height: "32px", zIndex: 10 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCoffee(coffee);
+                        }}
+                        title="Vezi detalii si editeaza"
+                      >
+                        ℹ
+                      </button>
 
-        {/* SECȚIUNE IMAGINE DINAMICĂ */}
-        <div className="text-center bg-light" style={{ height: "150px", overflow: "hidden" }}>
-          <img 
-            src={coffee.imagine || "/imagini/default-coffee.jpg"} 
-            alt={coffee.denumire}
-            className="w-100 h-100"
-            style={{ objectFit: "cover" }}
-            onError={(e) => { e.target.src = "/imagini/default-coffee.jpg"; }} 
-          />
-        </div>
+                      {/* SECȚIUNE IMAGINE DINAMICĂ */}
+                      <div className="text-center bg-light" style={{ height: "150px", overflow: "hidden" }}>
+                        <img
+                          src={coffee.imagine || "/imagini/default-coffee.jpg"}
+                          alt={coffee.denumire}
+                          className="w-100 h-100"
+                          style={{ objectFit: "cover" }}
+                          onError={(e) => { e.target.src = "/imagini/default-coffee.jpg"; }}
+                        />
+                      </div>
 
-        <div className="card-body p-3 text-center">
-          <h6 className="card-title fw-bold mb-1">{coffee.denumire}</h6>
-          <small className="text-muted d-block mb-2">{coffee.dimensiune || "Standard"}</small>
-          <h5 className="text-primary fw-bold mb-0">{coffee.pret} RON</h5>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
+                      <div className="card-body p-3 text-center">
+                        <h6 className="card-title fw-bold mb-1">{coffee.denumire}</h6>
+                        <small className="text-muted d-block mb-2">{coffee.dimensiune || "Standard"}</small>
+                        <h5 className="text-primary fw-bold mb-0">{coffee.pret} RON</h5>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -316,7 +374,7 @@ const AdminDashboard = () => {
                 </div>
               ) : (
                 cart.map((item) => (
-                  <div key={item.idCafea}  className="card mb-2 border-0 shadow-sm bg-light">
+                  <div key={item.idCafea} className="card mb-2 border-0 shadow-sm bg-light">
                     <div className="card-body p-2 d-flex align-items-center">
                       <div className="d-flex flex-column align-items-center me-3">
                         <button className="btn btn-sm btn-outline-secondary p-0 px-1" onClick={(e) => { e.stopPropagation(); updateQuantity(item.idCafea, 1); }}>▲</button>
