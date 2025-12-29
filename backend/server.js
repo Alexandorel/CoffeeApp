@@ -272,6 +272,29 @@ app.get('/istoric-comenzi', (req, res) => {
     });
 });
 
+// Istoric comenzi per angajat specific
+app.get('/istoric-comenzi/:idAngajat', (req, res) => {
+    const idAngajat = req.params.idAngajat;
+    const sql = `
+        SELECT 
+            idComanda, 
+            dataComenzii, 
+            total, 
+            metodaDePlata
+        FROM Comenzi
+        WHERE idAngajat = ?
+        ORDER BY dataComenzii DESC
+    `;
+
+    db.query(sql, [idAngajat], (err, results) => {
+        if (err) {
+            console.error("Eroare la preluarea istoricului personal:", err);
+            return res.status(500).json({ error: "Eroare server" });
+        }
+        res.json(results);
+    });
+});
+
 // Top 3 cele mai vandute produse
 app.get('/top-vanzari', (req, res) => {
     const sql = `

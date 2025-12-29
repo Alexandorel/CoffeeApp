@@ -6,6 +6,7 @@ import TopSalesModal from "../components/Modals/Admin/TopSalesModal";
 import DailySalesModal from "../components/Modals/Admin/DailySalesModal";
 import StaffStatsModal from "../components/Modals/Admin/StaffStatsModal";
 import PaymentModal from "../components/Modals/Common/PaymentModal";
+import PaymentStatsModal from "../components/Modals/Admin/PaymentStatsModal";
 import ProductDetailsModal from "../components/Modals/Common/ProductDetailsModal";
 
 const AdminDashboard = () => {
@@ -230,6 +231,12 @@ const AdminDashboard = () => {
         show={showStaffModal}
         onClose={() => setShowStaffModal(false)}
         data={staffStats}
+      />
+
+      <PaymentStatsModal
+        show={showPaymentStatsModal}
+        onClose={() => setShowPaymentStatsModal(false)}
+        data={paymentStats}
       />
 
       {/* Header */}

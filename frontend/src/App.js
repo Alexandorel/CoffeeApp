@@ -7,6 +7,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AddCoffeeForm from './pages/AddCoffeeForm'
 import EditCoffee from './pages/EditCoffee'
 import OrderHistory from './pages/OrderHistory';
+import EmployeeHistory from "./pages/EmployeeHistory";
 import AddEmployeeForm from './pages/AddEmployeeForm'
 import ManageEmployees from "./pages/ManageEmployees";
 import EditEmployee from "./pages/EditEmployee";
@@ -28,6 +29,7 @@ function App(){
         <Route path="/editare-angajat/:id" element={<EditEmployee />} />
         <Route path="/editare-cafea/:id" element={<EditCoffee />} />
         <Route path="/istoric" element={<OrderHistory />} />
+        <Route path="/istoric-personal" element={<EmployeeHistory />} />
         
       </Routes>
     </BrowserRouter>

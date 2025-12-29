@@ -11,31 +11,37 @@ const PaymentStatsModal = ({ show, onClose, data }) => {
     >
       <div
         className="bg-white p-4 rounded-4 shadow-lg border-0"
-        style={{ maxWidth: "400px", width: "90%" }}
+        style={{ maxWidth: "450px", width: "90%" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-4">
-          <h4 className="fw-bold m-0">Preferințe Plată</h4>
-          <p className="text-muted small">Analiza tranzacțiilor totale</p>
+          <h3 className="fw-bold text-dark">💳 Metode de Plată</h3>
+          <p className="text-muted">Preferințele clienților și procente</p>
         </div>
 
-        {data.map((stat, index) => (
-          <div key={index} className="mb-4">
-            <div className="d-flex justify-content-between mb-1">
-              <span className="fw-bold text-uppercase">{stat.metodaDePlata}</span>
-              <span className="text-muted">{stat.procent}% ({stat.total_utilizari})</span>
+        <div className="mb-4">
+          {data.map((stat, index) => (
+            <div key={index} className="mb-3">
+              <div className="d-flex justify-content-between mb-1">
+                <span className="fw-bold text-uppercase text-secondary">{stat.metodaDePlata}</span>
+                <span className="fw-bold">{stat.procent}% <small className="text-muted">({stat.total_utilizari})</small></span>
+              </div>
+              <div className="progress" style={{ height: "12px", borderRadius: "10px" }}>
+                <div
+                  className={`progress-bar ${stat.metodaDePlata === 'card' ? 'bg-primary' : 'bg-success'}`}
+                  role="progressbar"
+                  style={{ width: `${stat.procent}%` }}
+                  aria-valuenow={stat.procent}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
             </div>
-            <div className="progress" style={{ height: "10px" }}>
-              <div
-                className={`progress-bar ${stat.metodaDePlata === 'card' ? 'bg-primary' : 'bg-success'}`}
-                style={{ width: `${stat.procent}%` }}
-              ></div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
-        <button className="btn btn-dark w-100 mt-2" onClick={onClose}>
-          Închide
+        <button className="btn btn-dark w-100 py-2 fw-bold shadow-sm" onClick={onClose}>
+          Închide Raportul
         </button>
       </div>
     </div>
