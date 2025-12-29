@@ -310,6 +310,44 @@ app.get('/venit-zile', (req, res) => {
     });
 });
 
+// metoda plata favorita
+app.get('/metoda-plata-favorita', (req, res) => {
+    const sql = `
+        SELECT 
+            metodaDePlata, 
+            COUNT(*) AS total_utilizari,
+            ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM Comenzi)), 1) AS procent
+        FROM Comenzi
+        GROUP BY metodaDePlata
+        ORDER BY total_utilizari DESC
+    `;
+
+    db.query(sql, (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json(result);
+    });
+});
+
+// top angajati
+app.get('/top-angajati', (req, res) => {
+    const sql = `
+        SELECT 
+            a.nume, 
+            a.prenume, 
+            SUM(c.total) AS total_vanzari,
+            COUNT(c.idComanda) AS numar_comenzi
+        FROM Comenzi c
+        JOIN Angajat a ON c.idAngajat = a.idAngajat
+        GROUP BY a.idAngajat
+        ORDER BY total_vanzari DESC
+    `;
+
+    db.query(sql, (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json(result);
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server ascultă pe portul ${port}`);
 });

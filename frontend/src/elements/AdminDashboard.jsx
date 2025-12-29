@@ -10,14 +10,18 @@ const AdminDashboard = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [searchTerm, setSearchTerm] = useState("");
-  // stari necesare 'top 3 produse'
+  // stari 'top 3 produse'
   const [showTopModal, setShowTopModal] = useState(false);
   const [topProducts, setTopProducts] = useState([]);
-  // stari necesare top vanzari'
+  // stari top vanzari'
   const [showSalesModal, setShowSalesModal] = useState(false);
   const [dailySales, setDailySales] = useState([]);
-
-
+  // stari metoda plata favorita
+  const [showPaymentStatsModal, setShowPaymentStatsModal] = useState(false);
+  const [paymentStats, setPaymentStats] = useState([]);
+  // stari top angajati
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [staffStats, setStaffStats] = useState([]);
 
   const navigate = useNavigate();
 
@@ -138,6 +142,28 @@ const AdminDashboard = () => {
       setShowSalesModal(true);
     } catch (err) {
       console.error("Eroare la preluarea vânzărilor:", err);
+    }
+  };
+
+  // functie fetch metoda plata favorita
+  const fetchPaymentStats = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/metoda-plata-favorita");
+      setPaymentStats(res.data);
+      setShowPaymentStatsModal(true);
+    } catch (err) {
+      console.error("Eroare la preluarea statisticilor de plată:", err);
+    }
+  };
+
+  // functie fetcj top angajati
+  const fetchStaffStats = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/top-angajati");
+      setStaffStats(res.data);
+      setShowStaffModal(true);
+    } catch (err) {
+      console.error("Eroare la preluarea topului angajaților:", err);
     }
   };
 
@@ -278,7 +304,7 @@ const AdminDashboard = () => {
             <div className="table-responsive">
               <table className="table table-hover">
                 <thead className="table-light">
-                  <tr>
+                  <tr>xqd
                     <th>Data</th>
                     <th className="text-center">Comenzi</th>
                     <th className="text-end">Total Venit</th>
@@ -297,6 +323,84 @@ const AdminDashboard = () => {
             </div>
 
             <button className="btn btn-secondary w-100 mt-3" onClick={() => setShowSalesModal(false)}>
+              Închide
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showPaymentStatsModal && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
+          onClick={() => setShowPaymentStatsModal(false)}
+        >
+          <div
+            className="bg-white p-4 rounded-4 shadow-lg border-0"
+            style={{ maxWidth: "400px", width: "90%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center mb-4">
+              <h4 className="fw-bold m-0">Preferințe Plată</h4>
+              <p className="text-muted small">Analiza tranzacțiilor totale</p>
+            </div>
+
+            {paymentStats.map((stat, index) => (
+              <div key={index} className="mb-4">
+                <div className="d-flex justify-content-between mb-1">
+                  <span className="fw-bold text-uppercase">{stat.metodaDePlata}</span>
+                  <span className="text-muted">{stat.procent}% ({stat.total_utilizari})</span>
+                </div>
+                <div className="progress" style={{ height: "10px" }}>
+                  <div
+                    className={`progress-bar ${stat.metodaDePlata === 'card' ? 'bg-primary' : 'bg-success'}`}
+                    style={{ width: `${stat.procent}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+
+            <button className="btn btn-dark w-100 mt-2" onClick={() => setShowPaymentStatsModal(false)}>
+              Închide
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showStaffModal && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
+          onClick={() => setShowStaffModal(false)}
+        >
+          <div
+            className="bg-white p-4 rounded-4 shadow-lg border-0"
+            style={{ maxWidth: "450px", width: "90%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center mb-4">
+              <h4 className="fw-bold m-0">Clasament Vânzări</h4>
+              <p className="text-muted small">Performanța echipei pe perioada curentă</p>
+            </div>
+
+            <div className="list-group list-group-flush">
+              {staffStats.map((staff, index) => (
+                <div key={index} className="list-group-item d-flex align-items-center py-3 border-0 bg-light rounded-3 mb-2 shadow-sm">
+                  <div className="me-3 fw-bold text-primary fs-5" style={{ width: "25px" }}>
+                    #{index + 1}
+                  </div>
+                  <div className="flex-grow-1">
+                    <h6 className="fw-bold mb-0">{staff.prenume} {staff.nume}</h6>
+                    <small className="text-muted">{staff.numar_comenzi} comenzi procesate</small>
+                  </div>
+                  <div className="text-end">
+                    <span className="fw-bold text-success">{staff.total_vanzari.toFixed(2)} RON</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button className="btn btn-dark w-100 mt-3 py-2 fw-bold" onClick={() => setShowStaffModal(false)}>
               Închide
             </button>
           </div>
@@ -359,16 +463,24 @@ const AdminDashboard = () => {
                       Gestionare Angajați
                     </Link>
                   </li>
-
                   <li>
                     <button className="dropdown-item py-2 text-success fw-bold" onClick={fetchTopProducts}>
                       Top 3 Vânzări
                     </button>
                   </li>
-
                   <li>
                     <button className="dropdown-item py-2 text-info fw-bold" onClick={fetchDailySales}>
                       Venit pe Zile
+                    </button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item py-2 text-warning fw-bold" onClick={fetchPaymentStats}>
+                      Metoda de Plată Favorita
+                    </button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item py-2 text-primary fw-bold" onClick={fetchStaffStats}>
+                      Top Angajati
                     </button>
                   </li>
                   <li><hr className="dropdown-divider" /></li>
