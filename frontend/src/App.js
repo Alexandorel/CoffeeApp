@@ -2,14 +2,15 @@ import React from 'react'
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import EmployeeDashboard from './elements/EmployeeDashboard'
-import AdminDashboard from './elements/AdminDashboard'
-import AddCoffeeForm from './elements/AddCoffeeForm'
-import EditCoffee from './elements/EditCoffee'
-import OrderHistory from './elements/OrderHistory';
-import AddEmployeeForm from './elements/AddEmployeeForm'
-import ManageEmployees from "./elements/ManageEmployees";
-import Login from './elements/Login'
+import EmployeeDashboard from './pages/EmployeeDashboard'
+import AdminDashboard from './pages/AdminDashboard'
+import AddCoffeeForm from './pages/AddCoffeeForm'
+import EditCoffee from './pages/EditCoffee'
+import OrderHistory from './pages/OrderHistory';
+import AddEmployeeForm from './pages/AddEmployeeForm'
+import ManageEmployees from "./pages/ManageEmployees";
+import EditEmployee from "./pages/EditEmployee";
+import Login from './pages/Login'
 
 
 function App(){
@@ -24,6 +25,7 @@ function App(){
         <Route path="/adaugare-cafea" element={<AddCoffeeForm />}/>
         <Route path="/adaugare-angajat" element={<AddEmployeeForm />} />
         <Route path="/gestionare-angajati" element={<ManageEmployees />} />
+        <Route path="/editare-angajat/:id" element={<EditEmployee />} />
         <Route path="/editare-cafea/:id" element={<EditCoffee />} />
         <Route path="/istoric" element={<OrderHistory />} />
         

@@ -34,9 +34,9 @@ const ManageEmployees = () => {
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">👥 Gestionare Angajați</h2>
-        
+
         <Link to="/adaugare-angajat" className="btn btn-primary btn-lg shadow fw-bold me-2">
-            Adaugare Angajat
+          Adaugare Angajat
         </Link>
 
       </div>
@@ -64,9 +64,8 @@ const ManageEmployees = () => {
                   <td>{angajat.email}</td>
                   <td>
                     <span
-                      className={`badge ${
-                        angajat.rol === "admin" ? "bg-danger" : "bg-primary"
-                      }`}
+                      className={`badge ${angajat.rol === "admin" ? "bg-danger" : "bg-primary"
+                        }`}
                     >
                       {angajat.rol}
                     </span>
@@ -74,25 +73,31 @@ const ManageEmployees = () => {
                   <td>{angajat.functie}</td>
                   <td>
                     <button
+                      className="btn btn-warning btn-sm me-2 fw-bold"
+                      onClick={() => navigate(`/editare-angajat/${angajat.idAngajat}`)}
+                    >
+                      Editează
+                    </button>
+                    <button
                       className="btn btn-danger btn-sm"
                       onClick={() => handleDelete(angajat.idAngajat)}
                     >
-                        Sterge
+                      Sterge
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          
+
           {angajati.length === 0 && (
             <div className="text-center p-3">Nu exista angajati înregistrati.</div>
           )}
         </div>
       </div>
       <button className="btn btn-secondary mt-2" onClick={() => navigate("/adminDashboard")}>
-          Inapoi la Dashboard
-        </button>
+        Inapoi la Dashboard
+      </button>
     </div>
   );
 };

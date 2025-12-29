@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import TopSalesModal from "../components/Modals/Admin/TopSalesModal";
+import DailySalesModal from "../components/Modals/Admin/DailySalesModal";
+import StaffStatsModal from "../components/Modals/Admin/StaffStatsModal";
+import PaymentModal from "../components/Modals/Common/PaymentModal";
+import ProductDetailsModal from "../components/Modals/Common/ProductDetailsModal";
+
 const AdminDashboard = () => {
   const [coffees, setCoffees] = useState([]);
   const [cart, setCart] = useState([]);
@@ -37,14 +43,31 @@ const AdminDashboard = () => {
   }, []);
 
   const addToCart = (coffee) => {
+    // Verificăm dacă proprietatea stoc există. Dacă e undefined, o considerăm 0 pentru siguranță.
+    const stocDisponibil = coffee.stoc !== undefined && coffee.stoc !== null ? coffee.stoc : 0;
+
+    // 1. Verificăm dacă produsul mai are deloc stoc
+    if (stocDisponibil <= 0) {
+      alert(`Ne pare rău, ${coffee.denumire} nu mai este în stoc!`);
+      return;
+    }
+
     const exists = cart.find((item) => item.idCafea === coffee.idCafea);
+
     if (exists) {
+      // 2. Verificăm dacă adăugarea încă unei unități depășește stocul disponibil
+      if (exists.quantity >= stocDisponibil) {
+        alert(`Nu poți adăuga mai mult de ${stocDisponibil} unități (stoc limitat).`);
+        return;
+      }
+
       setCart(
         cart.map((i) =>
           i.idCafea === coffee.idCafea ? { ...i, quantity: i.quantity + 1 } : i
         )
       );
     } else {
+      // 3. Adăugăm prima unitate în coș
       setCart([...cart, { ...coffee, quantity: 1 }]);
     }
   };
@@ -170,242 +193,44 @@ const AdminDashboard = () => {
   return (
     <div className="min-vh-100 bg-light d-flex flex-column position-relative">
       {/* detalii produs */}
-      {selectedCoffee && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 3000 }}
-          onClick={() => setSelectedCoffee(null)}
-        >
-          <div
-            className="bg-white p-4 rounded shadow-lg"
-            style={{ maxWidth: "500px", width: "90%" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-              <h4 className="m-0 fw-bold text-primary">Detalii Produs</h4>
-              <button className="btn-close" onClick={() => setSelectedCoffee(null)}></button>
-            </div>
-            <div className="mb-3">
-              <p><strong>Denumire:</strong> {selectedCoffee.denumire}</p>
-              <p><strong>Tip Boaba:</strong> {selectedCoffee.tipBoaba || "-"}</p>
-              <p><strong>Origine:</strong> {selectedCoffee.origine || "-"}</p>
-              <p><strong>Grad Prajire:</strong> {selectedCoffee.gradulDePrajire || "-"}</p>
-              <p><strong>Pret:</strong> {selectedCoffee.pret} RON</p>
-              <p><strong>Stoc Actual:</strong> {selectedCoffee.stoc} buc</p>
-              <p><strong>Furnizor:</strong> {selectedCoffee.numeFurnizor || "Nespecificat"}</p>
-            </div>
-            <div className="d-flex gap-2 justify-content-end">
-              <button className="btn btn-secondary" onClick={() => setSelectedCoffee(null)}>Inchide</button>
-              <button className="btn btn-warning fw-bold text-dark" onClick={handleEdit}>Editeaza</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* În AdminDashboard, isAdmin este true */}
+      <ProductDetailsModal
+        show={!!selectedCoffee}
+        onClose={() => setSelectedCoffee(null)}
+        product={selectedCoffee}
+        onEdit={handleEdit}
+        isAdmin={true}
+      />
 
       {/* plata */}
-      {showPaymentModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 3000 }}
-          onClick={() => setShowPaymentModal(false)}
-        >
-          <div
-            className="bg-white p-4 rounded shadow-lg"
-            style={{ maxWidth: "400px", width: "90%" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4 className="mb-3 fw-bold text-primary">Alege metoda de plată</h4>
-            <div className="mb-3">
-              <label className="form-check">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  value="cash"
-                  checked={paymentMethod === "cash"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="form-check-label ms-2">Cash</span>
-              </label>
-              <label className="form-check mt-2">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  value="card"
-                  checked={paymentMethod === "card"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="form-check-label ms-2">Card</span>
-              </label>
-            </div>
-            <div className="d-flex gap-2 justify-content-end">
-              <button className="btn btn-secondary" onClick={() => setShowPaymentModal(false)}>Anuleaza</button>
-              <button className="btn btn-success fw-bold" onClick={confirmOrder}>Confirma</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PaymentModal
+        show={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onConfirm={confirmOrder}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+      />
 
-      {/* Modal Top Vanzari */}
-      {showTopModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
-          onClick={() => setShowTopModal(false)}
-        >
-          <div
-            className="bg-white p-4 rounded-4 shadow-lg border-0"
-            style={{ maxWidth: "450px", width: "90%" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center mb-4">
-              <h3 className="fw-bold text-dark">  Top Vânzări</h3>
-              <p className="text-muted">Cele mai populare produse</p>
-            </div>
-
-            <div className="list-group list-group-flush mb-4">
-              {topProducts.map((p, index) => (
-                <div key={index} className="list-group-item d-flex align-items-center border-0 py-3 bg-light rounded-3 mb-2">
-                  <span className="fs-3 me-3">
-                    {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
-                  </span>
-                  <div className="flex-grow-1">
-                    <h6 className="fw-bold mb-0">{p.denumire}</h6>
-                    <small className="text-muted">{p.total_vandut} unități vândute</small>
-                  </div>
-                  <span className="badge bg-primary rounded-pill">Top {index + 1}</span>
-                </div>
-              ))}
-            </div>
-
-            <button className="btn btn-dark w-100 py-2 fw-bold" onClick={() => setShowTopModal(false)}>
-              Închide
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Modal top vanzari */}
+      <TopSalesModal
+        show={showTopModal}
+        onClose={() => setShowTopModal(false)}
+        data={topProducts}
+      />
 
       {/* Modal Venit pe Zile */}
-      {showSalesModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
-          onClick={() => setShowSalesModal(false)}
-        >
-          <div
-            className="bg-white p-4 rounded-4 shadow-lg border-0"
-            style={{ maxWidth: "500px", width: "95%" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h4 className="fw-bold m-0">📊 Raport Vânzări Zilnice</h4>
-              <button className="btn-close" onClick={() => setShowSalesModal(false)}></button>
-            </div>
+      <DailySalesModal
+        show={showSalesModal}
+        onClose={() => setShowSalesModal(false)}
+        data={dailySales}
+      />
 
-            <div className="table-responsive">
-              <table className="table table-hover">
-                <thead className="table-light">
-                  <tr>xqd
-                    <th>Data</th>
-                    <th className="text-center">Comenzi</th>
-                    <th className="text-end">Total Venit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dailySales.map((item, index) => (
-                    <tr key={index}>
-                      <td className="fw-bold">{item.data}</td>
-                      <td className="text-center">{item.numar_comenzi}</td>
-                      <td className="text-end text-success fw-bold">{item.venit_total.toFixed(2)} RON</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <button className="btn btn-secondary w-100 mt-3" onClick={() => setShowSalesModal(false)}>
-              Închide
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showPaymentStatsModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
-          onClick={() => setShowPaymentStatsModal(false)}
-        >
-          <div
-            className="bg-white p-4 rounded-4 shadow-lg border-0"
-            style={{ maxWidth: "400px", width: "90%" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center mb-4">
-              <h4 className="fw-bold m-0">Preferințe Plată</h4>
-              <p className="text-muted small">Analiza tranzacțiilor totale</p>
-            </div>
-
-            {paymentStats.map((stat, index) => (
-              <div key={index} className="mb-4">
-                <div className="d-flex justify-content-between mb-1">
-                  <span className="fw-bold text-uppercase">{stat.metodaDePlata}</span>
-                  <span className="text-muted">{stat.procent}% ({stat.total_utilizari})</span>
-                </div>
-                <div className="progress" style={{ height: "10px" }}>
-                  <div
-                    className={`progress-bar ${stat.metodaDePlata === 'card' ? 'bg-primary' : 'bg-success'}`}
-                    style={{ width: `${stat.procent}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-
-            <button className="btn btn-dark w-100 mt-2" onClick={() => setShowPaymentStatsModal(false)}>
-              Închide
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showStaffModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
-          onClick={() => setShowStaffModal(false)}
-        >
-          <div
-            className="bg-white p-4 rounded-4 shadow-lg border-0"
-            style={{ maxWidth: "450px", width: "90%" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center mb-4">
-              <h4 className="fw-bold m-0">Clasament Vânzări</h4>
-              <p className="text-muted small">Performanța echipei pe perioada curentă</p>
-            </div>
-
-            <div className="list-group list-group-flush">
-              {staffStats.map((staff, index) => (
-                <div key={index} className="list-group-item d-flex align-items-center py-3 border-0 bg-light rounded-3 mb-2 shadow-sm">
-                  <div className="me-3 fw-bold text-primary fs-5" style={{ width: "25px" }}>
-                    #{index + 1}
-                  </div>
-                  <div className="flex-grow-1">
-                    <h6 className="fw-bold mb-0">{staff.prenume} {staff.nume}</h6>
-                    <small className="text-muted">{staff.numar_comenzi} comenzi procesate</small>
-                  </div>
-                  <div className="text-end">
-                    <span className="fw-bold text-success">{staff.total_vanzari.toFixed(2)} RON</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button className="btn btn-dark w-100 mt-3 py-2 fw-bold" onClick={() => setShowStaffModal(false)}>
-              Închide
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Modal performanta angajati */}
+      <StaffStatsModal
+        show={showStaffModal}
+        onClose={() => setShowStaffModal(false)}
+        data={staffStats}
+      />
 
       {/* Header */}
       <header className="bg-dark text-white py-3 shadow">
@@ -498,38 +323,64 @@ const AdminDashboard = () => {
                   <div className="col-12 col-sm-6 col-lg-4 col-xl-3" key={coffee.idCafea}>
                     <div
                       className="card shadow-sm h-100 border-0 position-relative overflow-hidden"
-                      style={{ cursor: "pointer", transition: "transform 0.2s" }}
-                      onClick={() => addToCart(coffee)}
-                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                      style={{
+                        cursor: coffee.stoc > 0 ? "pointer" : "not-allowed",
+                        transition: "transform 0.2s"
+                      }}
+                      // click adaugare produs in cos
+                      onClick={() => coffee.stoc > 0 && addToCart(coffee)}
+                      onMouseEnter={(e) => coffee.stoc > 0 && (e.currentTarget.style.transform = "scale(1.03)")}
                       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                     >
+
+                      {/* stoc critic*/}
+                      {coffee.stoc < 5 && coffee.stoc > 0 && (
+                        <span
+                          className="position-absolute top-0 start-0 m-2 badge rounded-pill bg-danger shadow-sm"
+                          style={{ zIndex: 10, fontSize: '0.7rem' }}
+                        >
+                          Stoc Limitat: {coffee.stoc}
+                        </span>
+                      )}
+
+                      {/* Butonul de info (ℹ) */}
                       <button
                         className="btn btn-light btn-sm position-absolute top-0 end-0 m-2 shadow-sm rounded-circle border"
                         style={{ width: "32px", height: "32px", zIndex: 10 }}
                         onClick={(e) => {
-                          e.stopPropagation();
+                          e.stopPropagation(); // OBLIGATORIU: Previne adăugarea în coș când vrei doar detalii
                           setSelectedCoffee(coffee);
                         }}
-                        title="Vezi detalii si editeaza"
                       >
                         ℹ
                       </button>
 
-                      {/* SECȚIUNE IMAGINE DINAMICĂ */}
+                      {/* Imaginea produsului */}
                       <div className="text-center bg-light" style={{ height: "150px", overflow: "hidden" }}>
                         <img
                           src={coffee.imagine || "/imagini/default-coffee.jpg"}
-                          alt={coffee.denumire}
                           className="w-100 h-100"
-                          style={{ objectFit: "cover" }}
+                          style={{
+                            objectFit: "cover",
+                            // Dacă stocul e 0, imaginea devine gri
+                            filter: coffee.stoc === 0 ? "grayscale(100%) opacity(0.5)" : "none"
+                          }}
                           onError={(e) => { e.target.src = "/imagini/default-coffee.jpg"; }}
                         />
                       </div>
 
                       <div className="card-body p-3 text-center">
                         <h6 className="card-title fw-bold mb-1">{coffee.denumire}</h6>
-                        <small className="text-muted d-block mb-2">{coffee.dimensiune || "Standard"}</small>
-                        <h5 className="text-primary fw-bold mb-0">{coffee.pret} RON</h5>
+                        <h5 className={`${coffee.stoc === 0 ? 'text-muted text-decoration-line-through' : 'text-primary'} fw-bold mb-0`}>
+                          {coffee.pret} RON
+                        </h5>
+
+                        {/* Mesaj pentru stoc epuizat */}
+                        {coffee.stoc === 0 && (
+                          <div className="mt-1">
+                            <span className="badge bg-secondary">Indisponibil</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

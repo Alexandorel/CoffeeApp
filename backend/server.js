@@ -72,7 +72,7 @@ app.post('/adauga-cafea', (req, res) => {
     }
 
     const sqlProdus = "INSERT INTO Produs (Nume, Stoc) VALUES (?, ?)";
-    
+
     db.query(sqlProdus, [nume, stoc || 0], (err, result) => {
         if (err) {
             console.error("Eroare la inserare Produs:", err);
@@ -83,7 +83,7 @@ app.post('/adauga-cafea', (req, res) => {
         console.log("Produs creat cu ID:", idProdusNou);
 
         const sqlCafea = "INSERT INTO Cafea (Denumire, TipBoaba, Origine, GradulDePrajire, Pret, idProdus) VALUES (?, ?, ?, ?, ?, ?)";
-        
+
         db.query(sqlCafea, [nume, tipBoaba, origine, prajire, pret, idProdusNou, idFurnizor], (err, result) => {
             if (err) {
                 console.error("Eroare la inserare Cafea:", err);
@@ -91,7 +91,7 @@ app.post('/adauga-cafea', (req, res) => {
             }
 
             const sqlLink = "INSERT INTO ProdusFurnizor (idProdus, idFurnizor) VALUES (?, ?)";
-            
+
             db.query(sqlLink, [idProdusNou, idFurnizor], (err, result) => {
                 if (err) {
                     console.error("❌ Eroare la legare Furnizor:", err);
@@ -137,47 +137,47 @@ app.get('/cafele', (req, res) => {
 
 // plasare comanda, actualizare stoc
 app.post("/comenzi", (req, res) => {
-  const { idAngajat, total, metodaDePlata, produse } = req.body;
+    const { idAngajat, total, metodaDePlata, produse } = req.body;
 
-  // inserare in tabela 'Comenzi'
-  const sqlComanda = "INSERT INTO Comenzi (idAngajat, total, metodaDePlata, dataComenzii) VALUES (?, ?, ?, NOW())";
+    // inserare in tabela 'Comenzi'
+    const sqlComanda = "INSERT INTO Comenzi (idAngajat, total, metodaDePlata, dataComenzii) VALUES (?, ?, ?, NOW())";
 
-  db.query(sqlComanda, [idAngajat, total, metodaDePlata], (err, result) => {
-    if (err) {
-      console.error("Eroare la inserarea comenzii:", err);
-      return res.status(500).json({ error: "Eroare server la crearea comenzii" });
-    }
+    db.query(sqlComanda, [idAngajat, total, metodaDePlata], (err, result) => {
+        if (err) {
+            console.error("Eroare la inserarea comenzii:", err);
+            return res.status(500).json({ error: "Eroare server la crearea comenzii" });
+        }
 
-    const idComanda = result.insertId;
+        const idComanda = result.insertId;
 
-    // pentru fiecare produs din lista, inserare detalii, reducere stoc
-    produse.forEach((produs) => {
-      // inserare în tabela 'DetaliiComanda'
-      const sqlDetalii = "INSERT INTO DetaliiComanda (idComanda, idCafea, cantitate, pretUnitar) VALUES (?, ?, ?, ?)";
-      db.query(sqlDetalii, [idComanda, produs.idCafea, produs.cantitate, produs.pret], (errDet) => {
-        if (errDet) console.error("Eroare la detalii comanda:", errDet);
+        // pentru fiecare produs din lista, inserare detalii, reducere stoc
+        produse.forEach((produs) => {
+            // inserare în tabela 'DetaliiComanda'
+            const sqlDetalii = "INSERT INTO DetaliiComanda (idComanda, idCafea, cantitate, pretUnitar) VALUES (?, ?, ?, ?)";
+            db.query(sqlDetalii, [idComanda, produs.idCafea, produs.cantitate, produs.pret], (errDet) => {
+                if (errDet) console.error("Eroare la detalii comanda:", errDet);
 
-        // reducere stoc
-        const sqlUpdateStoc = `
+                // reducere stoc
+                const sqlUpdateStoc = `
           UPDATE Produs 
           SET Stoc = Stoc - ? 
           WHERE idProdus = (SELECT idProdus FROM Cafea WHERE idCafea = ?)
         `;
 
-        db.query(sqlUpdateStoc, [produs.cantitate, produs.idCafea], (errStoc) => {
-          if (errStoc) console.error("Eroare la actualizarea stocului:", errStoc);
+                db.query(sqlUpdateStoc, [produs.cantitate, produs.idCafea], (errStoc) => {
+                    if (errStoc) console.error("Eroare la actualizarea stocului:", errStoc);
+                });
+            });
         });
-      });
-    });
 
-    res.json({ message: "Comandă plasată cu succes și stoc actualizat!", idComanda });
-  });
+        res.json({ message: "Comandă plasată cu succes și stoc actualizat!", idComanda });
+    });
 });
 
 // afisare furnizori
 app.get('/furnizori', (req, res) => {
-    const sql = "SELECT * FROM Furnizor"; 
-    
+    const sql = "SELECT * FROM Furnizor";
+
     db.query(sql, (err, data) => {
         if (err) return res.json(err);
         return res.json(data);
@@ -198,7 +198,7 @@ app.post('/adauga-angajat', (req, res) => {
     const { email, password, nume, prenume, rol, functie, dataAngajarii } = req.body;
 
     const sql = "INSERT INTO Angajat (email, password, nume, prenume, rol, functie, dataAngajarii) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    
+
     db.query(sql, [email, password, nume, prenume, rol, functie, dataAngajarii], (err, result) => {
         if (err) {
             console.error("Eroare inserare angajat:", err);
@@ -212,7 +212,7 @@ app.post('/adauga-angajat', (req, res) => {
 app.delete('/angajati/:id', (req, res) => {
     const id = req.params.id;
     const sql = "DELETE FROM Angajat WHERE idAngajat = ?";
-    
+
     db.query(sql, [id], (err, data) => {
         if (err) return res.json(err);
         return res.json("Angajat șters cu succes!");
@@ -235,12 +235,12 @@ app.put('/editare-cafea/:id', (req, res) => {
     const { denumire, tipBoaba, origine, gradulDePrajire, pret, stoc } = req.body;
 
     const sqlProdus = "UPDATE Produs SET Nume = ?, Stoc = ? WHERE idProdus = ?";
-    
+
     db.query(sqlProdus, [denumire, stoc, idProdus], (err, result) => {
         if (err) return res.status(500).json({ error: "Eroare la update Produs" });
 
         const sqlCafea = "UPDATE Cafea SET Denumire = ?, TipBoaba = ?, Origine = ?, GradulDePrajire = ?, Pret = ? WHERE idProdus = ?";
-        
+
         db.query(sqlCafea, [denumire, tipBoaba, origine, gradulDePrajire, pret, idProdus], (err2) => {
             if (err2) return res.status(500).json({ error: "Eroare la update Cafea" });
             res.json({ message: "Produs actualizat cu succes!" });
@@ -262,7 +262,7 @@ app.get('/istoric-comenzi', (req, res) => {
         JOIN Angajat a ON c.idAngajat = a.idAngajat
         ORDER BY c.dataComenzii DESC
     `;
-    
+
     db.query(sql, (err, results) => {
         if (err) {
             console.error("Eroare la preluarea istoricului:", err);
@@ -302,7 +302,7 @@ app.get('/venit-zile', (req, res) => {
         GROUP BY DATE(dataComenzii)
         ORDER BY DATE(dataComenzii) DESC
         LIMIT 7
-    `; 
+    `;
 
     db.query(sql, (err, result) => {
         if (err) return res.status(500).json(err);
@@ -345,6 +345,28 @@ app.get('/top-angajati', (req, res) => {
     db.query(sql, (err, result) => {
         if (err) return res.status(500).json(err);
         res.json(result);
+    });
+});
+
+// editare detalii angajati
+app.put('/editare-angajat/:id', (req, res) => {
+    const { nume, prenume, email, rol, functie } = req.body;
+    const sql = "UPDATE Angajat SET nume=?, prenume=?, email=?, rol=?, functie=? WHERE idAngajat=?";
+    db.query(sql, [nume, prenume, email, rol, functie, req.params.id], (err, result) => {
+        if (err) return res.status(500).send(err);
+        res.json({ message: "Succes" });
+    });
+});
+
+// preluare date individual pentru angajat (folosit la editare)
+app.get('/angajati/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT idAngajat, nume, prenume, email, rol, functie FROM Angajat WHERE idAngajat = ?";
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        if (result.length === 0) return res.status(404).json({ message: "Angajatul nu a fost găsit" });
+        res.json(result[0]); // Trimitem doar obiectul angajatului, nu tot array-ul
     });
 });
 
