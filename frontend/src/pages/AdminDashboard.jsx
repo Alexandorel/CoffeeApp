@@ -8,6 +8,7 @@ import StaffStatsModal from "../components/Modals/Admin/StaffStatsModal";
 import PaymentModal from "../components/Modals/Common/PaymentModal";
 import PaymentStatsModal from "../components/Modals/Admin/PaymentStatsModal";
 import ProductDetailsModal from "../components/Modals/Common/ProductDetailsModal";
+import AverageOrderModal from "../components/Modals/Admin/AverageOrderModal";
 
 const AdminDashboard = () => {
   const [coffees, setCoffees] = useState([]);
@@ -29,6 +30,10 @@ const AdminDashboard = () => {
   // stari top angajati
   const [showStaffModal, setShowStaffModal] = useState(false);
   const [staffStats, setStaffStats] = useState([]);
+
+  // stare avg valoare comenzi
+  const [showAvgModal, setShowAvgModal] = useState(false);
+  const [averageValue, setAverageValue] = useState(0);
 
   const navigate = useNavigate();
 
@@ -191,6 +196,17 @@ const AdminDashboard = () => {
     }
   };
 
+  // functie fetch avg comenzi
+  const fetchAverageOrder = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/statistici/medie-comanda");
+      setAverageValue(res.data.medieComanda);
+      setShowAvgModal(true);
+    } catch (err) {
+      console.error("Eroare la preluarea mediei:", err);
+    }
+  };
+
   return (
     <div className="min-vh-100 bg-light d-flex flex-column position-relative">
       {/* detalii produs */}
@@ -237,6 +253,12 @@ const AdminDashboard = () => {
         show={showPaymentStatsModal}
         onClose={() => setShowPaymentStatsModal(false)}
         data={paymentStats}
+      />
+
+      <AverageOrderModal
+        show={showAvgModal}
+        onClose={() => setShowAvgModal(false)}
+        value={averageValue}
       />
 
       {/* Header */}
@@ -308,6 +330,11 @@ const AdminDashboard = () => {
                   <li>
                     <button className="dropdown-item py-2 text-warning fw-bold" onClick={fetchPaymentStats}>
                       Metoda de Plată Favorita
+                    </button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item py-2 text-dark fw-bold" onClick={fetchAverageOrder}>
+                      📊 Medie Bani / Comandă
                     </button>
                   </li>
                   <li>

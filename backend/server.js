@@ -393,6 +393,24 @@ app.get('/angajati/:id', (req, res) => {
     });
 });
 
+// Q23: Calcularea valorii medii a unei comenzi (AOV - Average Order Value)
+app.get('/statistici/medie-comanda', (req, res) => {
+    // Folosim ROUND pentru a limita rezultatul la 2 zecimale (ex: 25.45 RON)
+    const sql = "SELECT ROUND(AVG(total), 2) AS medieComanda FROM Comenzi";
+
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error("Eroare la calcularea mediei pe comenzi:", err);
+            return res.status(500).json({ error: "Eroare la nivelul serverului" });
+        }
+
+        // Deoarece AVG returnează un singur rand, trimitem primul element din array
+        // Daca nu exista comenzi, returnam 0 pentru a evita erori în frontend
+        const data = result[0].medieComanda || 0;
+        res.json({ medieComanda: data });
+    });
+});
+
 app.listen(port, () => {
-    console.log(`Server ascultă pe portul ${port}`);
+    console.log(`Server asculta pe portul ${port}`);
 });
