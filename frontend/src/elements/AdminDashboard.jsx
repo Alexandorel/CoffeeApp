@@ -10,9 +10,12 @@ const AdminDashboard = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [searchTerm, setSearchTerm] = useState("");
-
+  // stari necesare 'top 3 produse'
   const [showTopModal, setShowTopModal] = useState(false);
   const [topProducts, setTopProducts] = useState([]);
+  // stari necesare top vanzari'
+  const [showSalesModal, setShowSalesModal] = useState(false);
+  const [dailySales, setDailySales] = useState([]);
 
 
 
@@ -124,6 +127,17 @@ const AdminDashboard = () => {
       setShowTopModal(true);
     } catch (err) {
       console.error("Eroare la preluarea topului:", err);
+    }
+  };
+
+  //functie fetch 'top vanzari'
+  const fetchDailySales = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/venit-zile");
+      setDailySales(res.data);
+      setShowSalesModal(true);
+    } catch (err) {
+      console.error("Eroare la preluarea vânzărilor:", err);
     }
   };
 
@@ -244,6 +258,51 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Modal Venit pe Zile */}
+      {showSalesModal && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 4000 }}
+          onClick={() => setShowSalesModal(false)}
+        >
+          <div
+            className="bg-white p-4 rounded-4 shadow-lg border-0"
+            style={{ maxWidth: "500px", width: "95%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h4 className="fw-bold m-0">📊 Raport Vânzări Zilnice</h4>
+              <button className="btn-close" onClick={() => setShowSalesModal(false)}></button>
+            </div>
+
+            <div className="table-responsive">
+              <table className="table table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th>Data</th>
+                    <th className="text-center">Comenzi</th>
+                    <th className="text-end">Total Venit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dailySales.map((item, index) => (
+                    <tr key={index}>
+                      <td className="fw-bold">{item.data}</td>
+                      <td className="text-center">{item.numar_comenzi}</td>
+                      <td className="text-end text-success fw-bold">{item.venit_total.toFixed(2)} RON</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <button className="btn btn-secondary w-100 mt-3" onClick={() => setShowSalesModal(false)}>
+              Închide
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-dark text-white py-3 shadow">
         <div className="container-fluid px-4 d-flex justify-content-between align-items-center">
@@ -304,6 +363,12 @@ const AdminDashboard = () => {
                   <li>
                     <button className="dropdown-item py-2 text-success fw-bold" onClick={fetchTopProducts}>
                       Top 3 Vânzări
+                    </button>
+                  </li>
+
+                  <li>
+                    <button className="dropdown-item py-2 text-info fw-bold" onClick={fetchDailySales}>
+                      Venit pe Zile
                     </button>
                   </li>
                   <li><hr className="dropdown-divider" /></li>

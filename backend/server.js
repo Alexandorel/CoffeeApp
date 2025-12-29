@@ -291,6 +291,25 @@ app.get('/top-vanzari', (req, res) => {
     });
 });
 
+// Venit total pe ultimele 7 zile
+app.get('/venit-zile', (req, res) => {
+    const sql = `
+        SELECT 
+            DATE_FORMAT(dataComenzii, '%d.%m.%Y') AS data, 
+            SUM(total) AS venit_total,
+            COUNT(idComanda) AS numar_comenzi
+        FROM Comenzi
+        GROUP BY DATE(dataComenzii)
+        ORDER BY DATE(dataComenzii) DESC
+        LIMIT 7
+    `; 
+
+    db.query(sql, (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json(result);
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server ascultă pe portul ${port}`);
 });
