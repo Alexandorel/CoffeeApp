@@ -5,12 +5,27 @@ import { Link } from "react-router-dom";
 
 const ManageEmployees = () => {
   const [angajati, setAngajati] = useState([]);
+  //stare pentru textul cautat
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Încărcăm angajații la pornire
-  useEffect(() => {
-    fetchAngajati();
-  }, []);
+  // Încarcam angajatii la pornire
+  // Inlocuieste vechiul useEffect cu acesta:
+useEffect(() => {
+  const delayDebounceFn = setTimeout(() => {
+    if (searchTerm.trim() !== "") {
+      // Daca exista text, apelam ruta de cautare
+      axios.get(`http://localhost:8000/angajati/cautare?q=${searchTerm}`)
+        .then((res) => setAngajati(res.data))
+        .catch((err) => console.error("Eroare la cautare:", err));
+    } else {
+      // Daca search-ul e gol, aducem toti angajatii
+      fetchAngajati();
+    }
+  }, 300); // Asteapta 300ms dupa ultima tasta apasata
+
+  return () => clearTimeout(delayDebounceFn);
+}, [searchTerm]);
 
   const fetchAngajati = () => {
     axios.get("/angajati")
@@ -48,6 +63,14 @@ const ManageEmployees = () => {
         </Link>
 
       </div>
+      <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Cauta nume sau email..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ width: '300px' }}
+            />
 
       <div className="card shadow">
         <div className="card-body">

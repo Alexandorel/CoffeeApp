@@ -253,6 +253,25 @@ app.put('/resetare-parola-angajat/:id', (req, res) => {
     });
 });
 
+// Cautare angajati dupa nume sau email
+app.get('/angajati/cautare', (req, res) => {
+    const query = req.query.q; // preluam textul din URL (ex: ?q=Popescu)
+    
+    // Instructiunea SQL cu operatorul LIKE pentru cautare partiala
+    const sql = `
+        SELECT idAngajat, nume, prenume, email, rol, functie 
+        FROM Angajat 
+        WHERE nume LIKE ? OR prenume LIKE ? OR email LIKE ?
+    `;
+    
+    const searchTerm = `%${query}%`; // Adaugam % pentru a gasi rezultate care contin textul
+    
+    db.query(sql, [searchTerm, searchTerm, searchTerm], (err, results) => {
+        if (err) return res.status(500).json(err);
+        res.json(results);
+    });
+});
+
 // interogare cafea individuala pentru modificare
 app.get('/cafele/:id', (req, res) => {
     const id = req.params.id;
