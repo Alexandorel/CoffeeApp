@@ -18,6 +18,14 @@ const ManageEmployees = () => {
       .catch((err) => console.error(err));
   };
 
+  const handleResetPassword = (id, nume) => {
+    if (window.confirm(`Esti sigur ca vrei sa resetezi parola pentru ${nume}? Noua parola va fi '123456'.`)) {
+      axios.put(`http://localhost:8000/resetare-parola-angajat/${id}`)
+        .then(() => alert(`Succes! Parola pentru ${nume} a fost resetata.`))
+        .catch((err) => alert("Eroare la resetare!"));
+    }
+  };
+
   const handleDelete = (id) => {
     // Confirmare înainte de ștergere
     if (window.confirm("Esti sigur ca vrei sa sșergi acest angajat?")) {
@@ -77,6 +85,12 @@ const ManageEmployees = () => {
                       onClick={() => navigate(`/editare-angajat/${angajat.idAngajat}`)}
                     >
                       Editează
+                    </button>
+                    <button
+                      className="btn btn-info btn-sm me-2 fw-bold text-white"
+                      onClick={() => handleResetPassword(angajat.idAngajat, angajat.nume)}
+                    >
+                      Resetare parola
                     </button>
                     <button
                       className="btn btn-danger btn-sm"

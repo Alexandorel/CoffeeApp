@@ -241,6 +241,18 @@ app.delete('/angajati/:id', (req, res) => {
     });
 });
 
+// resetare parola angajat de catre admin
+app.put('/resetare-parola-angajat/:id', (req, res) => {
+    const id = req.params.id;
+    const parolaGenerica = "123456"; // Parola pe care o va primi angajatul
+
+    const sql = "UPDATE Angajat SET password = ? WHERE idAngajat = ?";
+    db.query(sql, [parolaGenerica, id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json({ message: "Parola a fost resetata la '123456'" });
+    });
+});
+
 // interogare cafea individuala pentru modificare
 app.get('/cafele/:id', (req, res) => {
     const id = req.params.id;
