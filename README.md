@@ -30,3 +30,14 @@
   ->terminal ->cd frontend -> npm start
 ```
 
+Date logare pentru testare
+```bash
+  admin:
+    admin@gmail.com
+    admin
+
+  angajat:
+    alexandru@gmail.com
+    alexandru
+```
+
