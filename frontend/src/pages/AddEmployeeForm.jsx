@@ -24,19 +24,19 @@ const AddEmployeeForm = () => {
 
     axios.post("/adauga-angajat", formData)
       .then(() => {
-        alert("Angajat adăugat cu succes! ✅");
-        navigate("/gestionare-angajati"); // Te întoarce la Dashboard
+        alert("Angajat adaugat cu succes! ✅");
+        navigate("/gestionare-angajati"); // Te intoarce la Dashboard
       })
       .catch((err) => {
         console.error(err);
-        alert("Eroare la salvare! Verifică serverul.");
+        alert("Eroare la salvare! Verifica serverul.");
       });
   };
 
   return (
     <div className="container mt-5">
       <div className="card shadow p-4 mx-auto" style={{ maxWidth: "600px" }}>
-        <h3 className="mb-4 text-center">👤 Înregistrare Angajat Nou</h3>
+        <h3 className="mb-4 text-center">👤 Inregistrare Angajat Nou</h3>
 
         <form onSubmit={handleSubmit}>
           <div className="row">
@@ -56,7 +56,7 @@ const AddEmployeeForm = () => {
               <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} required />
             </div>
             <div className="col-md-6 mb-3">
-              <label className="form-label">Parolă</label>
+              <label className="form-label">Parola</label>
               <input type="password" className="form-control" name="password" value={formData.password} onChange={handleChange} required />
             </div>
 
@@ -69,22 +69,22 @@ const AddEmployeeForm = () => {
               </select>
             </div>
             <div className="col-md-6 mb-3">
-              <label className="form-label">Funcție (Titlu)</label>
+              <label className="form-label">Functie (Titlu)</label>
               <input type="text" className="form-control" name="functie" placeholder="ex: Barista, Manager" value={formData.functie} onChange={handleChange} required />
             </div>
 
             <div className="col-md-12 mb-4">
-              <label className="form-label">Data Angajării</label>
+              <label className="form-label">Data Angajarii</label>
               <input type="date" className="form-control" name="dataAngajarii" value={formData.dataAngajarii} onChange={handleChange} required />
             </div>
           </div>
 
           <div className="d-flex gap-3">
             <button type="button" className="btn btn-secondary w-50" onClick={() => navigate("/gestionare-angajati")}>
-              ⬅️ Înapoi
+              ⬅️ Inapoi
             </button>
             <button type="submit" className="btn btn-primary w-50 fw-bold">
-              SALVEAZĂ ANGAJAT
+              SALVEAZA ANGAJAT
             </button>
           </div>
         </form>

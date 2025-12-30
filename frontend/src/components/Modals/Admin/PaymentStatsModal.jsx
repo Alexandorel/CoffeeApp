@@ -15,8 +15,8 @@ const PaymentStatsModal = ({ show, onClose, data }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-4">
-          <h3 className="fw-bold text-dark">💳 Metode de Plată</h3>
-          <p className="text-muted">Preferințele clienților și procente</p>
+          <h3 className="fw-bold text-dark">💳 Metode de Plata</h3>
+          <p className="text-muted">Preferintele clientilor si procente</p>
         </div>
 
         <div className="mb-4">
@@ -41,7 +41,7 @@ const PaymentStatsModal = ({ show, onClose, data }) => {
         </div>
 
         <button className="btn btn-dark w-100 py-2 fw-bold shadow-sm" onClick={onClose}>
-          Închide Raportul
+          Inchide Raportul
         </button>
       </div>
     </div>

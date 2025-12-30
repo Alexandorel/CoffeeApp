@@ -19,7 +19,7 @@ const AddCoffeeForm = ({ onProductAdded }) => {
   const [furnizori, setFurnizori] = useState([]);
   const [message, setMessage] = useState(null);
 
-  // Încărcăm lista de furnizori
+  // Incarcam lista de furnizori
   useEffect(() => {
     axios.get("http://localhost:8000/furnizori")
       .then((res) => setFurnizori(res.data))
@@ -34,14 +34,14 @@ const AddCoffeeForm = ({ onProductAdded }) => {
     e.preventDefault();
 
     if (!formData.idFurnizor) {
-      alert("Te rog selectează un furnizor!");
+      alert("Te rog selectaza un furnizor!");
       return;
     }
 
     axios.post("http://localhost:8000/adauga-cafea", formData)
       .then((res) => {
-        setMessage("Cafea adăugată cu succes! ✅");
-        // Resetăm formularul
+        setMessage("Cafea adaugata cu succes! ✅");
+        // Resetam formularul
         setFormData({
             nume: "", tipBoaba: "Arabica", origine: "", 
             prajire: "Medie", pret: "", 
@@ -57,7 +57,7 @@ const AddCoffeeForm = ({ onProductAdded }) => {
       })
       .catch((err) => {
         console.error(err);
-        alert("Eroare la salvare! Verifica consola.");
+        alert("Ereare la salvare! Verifica consola.");
       });
   };
 
@@ -122,9 +122,9 @@ const AddCoffeeForm = ({ onProductAdded }) => {
           <div className="col-md-4 mb-3">
             <label className="form-label">Prajire</label>
             <select className="form-select" name="prajire" value={formData.prajire} onChange={handleChange}>
-              <option value="Slabă">Slaba (Light)</option>
+              <option value="Slaba">Slaba (Light)</option>
               <option value="Medie">Medie</option>
-              <option value="Intensă">Intensa (Dark)</option>
+              <option value="Intensa">Intensa (Dark)</option>
             </select>
           </div>
         </div>

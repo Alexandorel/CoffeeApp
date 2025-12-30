@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
-// IMPORTĂ COMPONENTELE COMUNE
+// IMPORTA COMPONENTELE COMUNE
 import PaymentModal from "../components/Modals/Common/PaymentModal";
 import ProductDetailsModal from "../components/Modals/Common/ProductDetailsModal";
 import ChangePasswordModal from "../components/Modals/Common/ChangePasswordModal";
@@ -37,7 +37,7 @@ const EmployeeDashboard = () => {
     const stocDisponibil = coffee.stoc ?? 0;
 
     if (stocDisponibil <= 0) {
-      alert(`Ne pare rau, ${coffee.denumire} nu mai este în stoc!`);
+      alert(`Ne pare rau, ${coffee.denumire} nu mai este in stoc!`);
       return;
     }
 
@@ -45,7 +45,7 @@ const EmployeeDashboard = () => {
 
     if (exists) {
       if (exists.quantity >= stocDisponibil) {
-        alert(`Stoc limitat! Nu poți adăuga mai mult de ${stocDisponibil} unități.`);
+        alert(`Stoc limitat! Nu poti adauga mai mult de ${stocDisponibil} unitati.`);
         return;
       }
       setCart(cart.map((i) => i.idCafea === coffee.idCafea ? { ...i, quantity: i.quantity + 1 } : i));
@@ -59,7 +59,7 @@ const EmployeeDashboard = () => {
     const coffeeFromDb = coffees.find(c => c.idCafea === idCafea);
 
     if (change > 0 && itemInCart && coffeeFromDb && itemInCart.quantity >= coffeeFromDb.stoc) {
-      alert("Nu poți depăși stocul disponibil!");
+      alert("Nu poti depasi stocul disponibil!");
       return;
     }
 
@@ -219,7 +219,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-          {/* Secțiune Coș */}
+          {/* Sectiune Cos */}
           <div className="col-md-4 bg-white border-start shadow-sm d-flex flex-column p-0">
             <div className="p-3 bg-light border-bottom"><h4 className="fw-bold m-0">🛒 Bon Fiscal</h4></div>
             <div className="flex-grow-1 overflow-auto p-3">

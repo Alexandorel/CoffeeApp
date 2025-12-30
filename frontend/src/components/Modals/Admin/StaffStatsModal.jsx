@@ -1,7 +1,7 @@
 import React from "react";
 
 const StaffStatsModal = ({ show, onClose, data }) => {
-  // Dacă starea 'show' este false, nu randăm nimic
+  // Daca starea 'show' este false, nu randam nimic
   if (!show) return null;
 
   return (
@@ -16,8 +16,8 @@ const StaffStatsModal = ({ show, onClose, data }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-4">
-          <h4 className="fw-bold m-0">Clasament Vânzări</h4>
-          <p className="text-muted small">Performanța echipei pe perioada curentă</p>
+          <h4 className="fw-bold m-0">Clasament Vanzari</h4>
+          <p className="text-muted small">Performanta echipei pe perioada curenta</p>
         </div>
 
         <div className="list-group list-group-flush">
@@ -46,13 +46,13 @@ const StaffStatsModal = ({ show, onClose, data }) => {
             ))
           ) : (
             <div className="text-center py-4 text-muted">
-              Nu există date despre performanța angajaților.
+              Nu exista date despre performanta angajatilor.
             </div>
           )}
         </div>
 
         <button className="btn btn-dark w-100 mt-3 py-2 fw-bold" onClick={onClose}>
-          Închide
+          Inchide
         </button>
       </div>
     </div>

@@ -53,21 +53,21 @@ const AdminDashboard = () => {
   }, []);
 
   const addToCart = (coffee) => {
-    // Verificăm dacă proprietatea stoc există. Dacă e undefined, o considerăm 0 pentru siguranță.
+    // Verificam daca proprietatea stoc exista. Daca e undefined, o consideram 0 pentru siguranta.
     const stocDisponibil = coffee.stoc !== undefined && coffee.stoc !== null ? coffee.stoc : 0;
 
-    // 1. Verificăm dacă produsul mai are deloc stoc
+    // 1. Verificam daca produsul mai are deloc stoc
     if (stocDisponibil <= 0) {
-      alert(`Ne pare rău, ${coffee.denumire} nu mai este în stoc!`);
+      alert(`Ne pare rau, ${coffee.denumire} nu mai este in stoc!`);
       return;
     }
 
     const exists = cart.find((item) => item.idCafea === coffee.idCafea);
 
     if (exists) {
-      // 2. Verificăm dacă adăugarea încă unei unități depășește stocul disponibil
+      // 2. Verificam daca adaugarea inca unei unitati depaseste stocul disponibil
       if (exists.quantity >= stocDisponibil) {
-        alert(`Nu poți adăuga mai mult de ${stocDisponibil} unități (stoc limitat).`);
+        alert(`Nu poti adauga mai mult de ${stocDisponibil} unitati (stoc limitat).`);
         return;
       }
 
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
         )
       );
     } else {
-      // 3. Adăugăm prima unitate în coș
+      // 3. Adaugam prima unitate in cos
       setCart([...cart, { ...coffee, quantity: 1 }]);
     }
   };
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
   const getTotalPrice = () =>
     cart.reduce((s, i) => s + i.pret * i.quantity, 0).toFixed(2);
 
-  // Deschide modalul de plată
+  // Deschide modalul de plata
   const handlePlaceOrder = () => {
     if (cart.length === 0) return;
     setShowPaymentModal(true);
@@ -109,13 +109,13 @@ const AdminDashboard = () => {
 
   // Confirma comanda cu metoda de plata
   const confirmOrder = async () => {
-    // 1. Încercam ambele variante de structura pentru siguranta
+    // 1. Incercam ambele variante de structura pentru siguranta
     const realAngajatId = user?.idAngajat || user?.angajat?.idAngajat;
 
     console.log("ID Angajat trimis:", realAngajatId);
 
     if (!realAngajatId) {
-      alert("Eroare: Nu s-a putut identifica angajatul. Te rugăm să te reconectezi.");
+      alert("Eroare: Nu s-a putut identifica angajatul. Te rugam sa te reconectezi.");
       return;
     }
 
@@ -134,10 +134,10 @@ const AdminDashboard = () => {
       const res = await axios.post("http://localhost:8000/comenzi", orderData);
 
       setOrderPlaced(true);
-      setCart([]); // Golește coșul
+      setCart([]); // Goleste cosul
       setShowPaymentModal(false);
 
-      // ACTUALIZARE VIZUALĂ: Reîncărcăm lista de cafele din baza de date
+      // ACTUALIZARE VIZUALA: Reincarcam lista de cafele din baza de date
       const freshCoffees = await axios.get("http://localhost:8000/cafele");
       setCoffees(freshCoffees.data);
 
@@ -197,7 +197,7 @@ const handleDelete = async (idProdus, nume) => {
       setDailySales(res.data);
       setShowSalesModal(true);
     } catch (err) {
-      console.error("Eroare la preluarea vânzărilor:", err);
+      console.error("Eroare la preluarea vanzarilor:", err);
     }
   };
 
@@ -208,7 +208,7 @@ const handleDelete = async (idProdus, nume) => {
       setPaymentStats(res.data);
       setShowPaymentStatsModal(true);
     } catch (err) {
-      console.error("Eroare la preluarea statisticilor de plată:", err);
+      console.error("Eroare la preluarea statisticilor de plata:", err);
     }
   };
 
@@ -219,7 +219,7 @@ const handleDelete = async (idProdus, nume) => {
       setStaffStats(res.data);
       setShowStaffModal(true);
     } catch (err) {
-      console.error("Eroare la preluarea topului angajaților:", err);
+      console.error("Eroare la preluarea topului angajatilor:", err);
     }
   };
 
@@ -237,7 +237,7 @@ const handleDelete = async (idProdus, nume) => {
   return (
     <div className="min-vh-100 bg-light d-flex flex-column position-relative">
       {/* detalii produs */}
-      {/* În AdminDashboard, isAdmin este true */}
+      {/* In AdminDashboard, isAdmin este true */}
       <ProductDetailsModal
         show={!!selectedCoffee}
         onClose={() => setSelectedCoffee(null)}
@@ -336,7 +336,7 @@ const handleDelete = async (idProdus, nume) => {
                 <input
                   type="text"
                   className="form-control border-start-0"
-                  placeholder="Caută produs..."
+                  placeholder="Cauta produs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -360,12 +360,12 @@ const handleDelete = async (idProdus, nume) => {
                   </li>
                   <li>
                     <Link to="/gestionare-angajati" className="dropdown-item py-2">
-                      Gestionare Angajați
+                      Gestionare Angajati
                     </Link>
                   </li>
                   <li>
                     <button className="dropdown-item py-2 text-success fw-bold" onClick={fetchTopProducts}>
-                      Top 3 Vânzări
+                      Top 3 Vanzari
                     </button>
                   </li>
                   <li>
@@ -375,12 +375,12 @@ const handleDelete = async (idProdus, nume) => {
                   </li>
                   <li>
                     <button className="dropdown-item py-2 text-warning fw-bold" onClick={fetchPaymentStats}>
-                      Metoda de Plată Favorita
+                      Metoda de Plata Favorita
                     </button>
                   </li>
                   <li>
                     <button className="dropdown-item py-2 text-dark fw-bold" onClick={fetchAverageOrder}>
-                      📊 Medie Bani / Comandă
+                      📊 Medie Bani / Comanda
                     </button>
                   </li>
                   <li>
@@ -428,7 +428,7 @@ const handleDelete = async (idProdus, nume) => {
                         className="btn btn-light btn-sm position-absolute top-0 end-0 m-2 shadow-sm rounded-circle border"
                         style={{ width: "32px", height: "32px", zIndex: 10 }}
                         onClick={(e) => {
-                          e.stopPropagation(); // OBLIGATORIU: Previne adăugarea în coș când vrei doar detalii
+                          e.stopPropagation(); // OBLIGATORIU: Previne adaugarea in cos cand vrei doar detalii
                           setSelectedCoffee(coffee);
                         }}
                       >
@@ -442,7 +442,7 @@ const handleDelete = async (idProdus, nume) => {
                           className="w-100 h-100"
                           style={{
                             objectFit: "cover",
-                            // Dacă stocul e 0, imaginea devine gri
+                            // Daca stocul e 0, imaginea devine gri
                             filter: coffee.stoc === 0 ? "grayscale(100%) opacity(0.5)" : "none"
                           }}
                           onError={(e) => { e.target.src = "/imagini/default-coffee.jpg"; }}

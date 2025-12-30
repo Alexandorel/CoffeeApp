@@ -14,7 +14,7 @@ function Login() {
       const res = await axios.post('/logare', { email, password });
       
       //Verificare daca login
-      console.log('Login reușit:', res.data);
+      console.log('Login reusit:', res.data);
 
       const user = res.data.angajat;
       const rolUser = user.rol;
@@ -72,7 +72,7 @@ function Login() {
           }}>
             VintHUB Coffe
           </h1>
-          <p style={{ color: '#6b7280' }}>Fiecare ceașcă de cafea ascunde o poveste.</p>
+          <p style={{ color: '#6b7280' }}>Fiecare ceasca de cafea ascunde o poveste.</p>
           {error && (
             <div style={{ 
               color: '#dc2626', 
@@ -143,7 +143,7 @@ function Login() {
                 marginBottom: '8px' 
               }}
             >
-              Parolă
+              Parola
             </label>
             <input
               id="password"

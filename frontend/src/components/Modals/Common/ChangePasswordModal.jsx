@@ -17,7 +17,7 @@ const ChangePasswordModal = ({ show, onClose, employeeId }) => {
       setPassData({ oldPassword: "", newPassword: "" });
       onClose();
     } catch (err) {
-      alert(err.response?.data?.message || "❌ Eroare la schimbarea parolei");
+      alert(err.response?.data?.message || "Eroare la schimbarea parolei");
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ const ChangePasswordModal = ({ show, onClose, employeeId }) => {
                 Anuleaza
               </button>
               <button type="submit" className="btn btn-warning fw-bold px-4" disabled={loading}>
-                {loading ? "Se salvează..." : "Actualizeaza Parola"}
+                {loading ? "Se salveaza..." : "Actualizeaza Parola"}
               </button>
             </div>
           </form>

@@ -6,7 +6,7 @@ const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Inițializăm starea cu șiruri goale pentru a evita erorile de tip "undefined" în input-uri
+  // Initializam starea cu siruri goale pentru a evita erorile de tip "undefined" in input-uri
   const [formData, setFormData] = useState({
     nume: "",
     prenume: "",
@@ -15,11 +15,11 @@ const EditEmployee = () => {
     functie: ""
   });
 
-  // PASUL 1: Când se deschide pagina, luăm datele EXISTENTE din DB
+  // PASUL 1: Cand se deschide pagina, luam datele EXISTENTE din DB
   useEffect(() => {
     axios.get(`http://localhost:8000/angajati/${id}`)
       .then((res) => {
-        // Aici populăm formularul cu ce există deja în baza de date
+        // Aici populam formularul cu ce exista deja in baza de date
         if (res.data) {
           setFormData({
             nume: res.data.nume || "",
@@ -33,7 +33,7 @@ const EditEmployee = () => {
       .catch((err) => console.error("Eroare la preluarea datelor:", err));
   }, [id]);
 
-  // Funcție generică pentru a actualiza doar câmpul pe care îl tastezi
+  // Functie generica pentru a actualiza doar campul pe care il tastezi
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -42,9 +42,9 @@ const EditEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Trimitem tot obiectul formData (conține și ce ai modificat, și ce a rămas la fel)
+      // Trimitem tot obiectul formData (contine si ce ai modificat, si ce a ramas la fel)
       await axios.put(`http://localhost:8000/editare-angajat/${id}`, formData);
-      alert("✅ Modificări salvate!");
+      alert("✅ Modificari salvate!");
       navigate("/gestionare-angajati");
     } catch (err) {
       alert("❌ Eroare la salvare!");
@@ -57,12 +57,12 @@ const EditEmployee = () => {
         <div className="col-md-6">
           <div className="card shadow-lg border-0">
             <div className="card-header bg-warning p-3">
-              <h4 className="m-0 fw-bold text-dark">📝 Editează profilul lui {formData.nume}</h4>
+              <h4 className="m-0 fw-bold text-dark">📝 Editeaza profilul lui {formData.nume}</h4>
             </div>
             <div className="card-body p-4">
               <form onSubmit={handleSubmit}>
                 
-                {/* Observă atributul 'value={formData.nume}' - acesta afișează data existentă */}
+                {/* Observa atributul 'value={formData.nume}' - acesta afiseaza data existenta */}
                 <div className="mb-3">
                   <label className="form-label fw-bold">Nume</label>
                   <input 
@@ -110,7 +110,7 @@ const EditEmployee = () => {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label fw-bold">Funcție</label>
+                  <label className="form-label fw-bold">Functie</label>
                   <input 
                     type="text" 
                     name="functie"
@@ -122,10 +122,10 @@ const EditEmployee = () => {
 
                 <div className="d-flex gap-2 mt-4">
                   <button type="button" className="btn btn-secondary w-50" onClick={() => navigate(-1)}>
-                    Înapoi
+                    Inapoi
                   </button>
                   <button type="submit" className="btn btn-dark w-50 fw-bold">
-                    Salvează Modificările
+                    Salveaza Modificarile
                   </button>
                 </div>
               </form>

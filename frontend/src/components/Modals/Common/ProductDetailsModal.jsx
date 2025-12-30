@@ -22,10 +22,10 @@ const ProductDetailsModal = ({ show, onClose, product, onEdit, onDelete, isAdmin
         <div className="mb-4">
           <div className="row g-2">
             <div className="col-6"><strong>Denumire:</strong></div> <div className="col-6">{product.denumire}</div>
-            <div className="col-6"><strong>Tip Boabă:</strong></div> <div className="col-6">{product.tipBoaba || "-"}</div>
+            <div className="col-6"><strong>Tip Boaba:</strong></div> <div className="col-6">{product.tipBoaba || "-"}</div>
             <div className="col-6"><strong>Origine:</strong></div> <div className="col-6">{product.origine || "-"}</div>
-            <div className="col-6"><strong>Grad Prăjire:</strong></div> <div className="col-6">{product.gradulDePrajire || "-"}</div>
-            <div className="col-6"><strong>Preț:</strong></div> <div className="col-6 text-success fw-bold">{product.pret} RON</div>
+            <div className="col-6"><strong>Grad Prajire:</strong></div> <div className="col-6">{product.gradulDePrajire || "-"}</div>
+            <div className="col-6"><strong>Pret:</strong></div> <div className="col-6 text-success fw-bold">{product.pret} RON</div>
             <div className="col-6"><strong>Stoc Actual:</strong></div> 
             <div className={`col-6 fw-bold ${product.stoc < 5 ? 'text-danger' : 'text-dark'}`}>
               {product.stoc} buc
@@ -35,7 +35,7 @@ const ProductDetailsModal = ({ show, onClose, product, onEdit, onDelete, isAdmin
         </div>
 
         <div className="d-flex gap-2 justify-content-end border-top pt-3">
-          <button className="btn btn-secondary px-4" onClick={onClose}>Închide</button>
+          <button className="btn btn-secondary px-4" onClick={onClose}>Inchide</button>
           
           {/* GRUPARE CU FRAGMENT PENTRU A EVITA EROAREA */}
           {isAdmin && (

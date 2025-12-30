@@ -6,7 +6,7 @@ const EmployeeHistory = () => {
     const [orders, setOrders] = useState([]);
     const navigate = useNavigate();
     
-    // Preluăm datele angajatului logat
+    // Preluam datele angajatului logat
     const user = JSON.parse(localStorage.getItem("user"));
     const angajatId = user?.idAngajat || user?.angajat?.idAngajat;
 
@@ -22,9 +22,9 @@ const EmployeeHistory = () => {
         <div className="min-vh-100 bg-light py-5">
             <div className="container">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2 className="fw-bold text-dark">🧾 Istoricul Meu de Vânzări</h2>
+                    <h2 className="fw-bold text-dark">🧾 Istoricul Meu de Vanzari</h2>
                     <button className="btn btn-dark shadow-sm" onClick={() => navigate(-1)}>
-                        Înapoi la Dashboard
+                        Inapoi la Dashboard
                     </button>
                 </div>
 
@@ -33,9 +33,9 @@ const EmployeeHistory = () => {
                         <table className="table table-hover align-middle mb-0">
                             <thead className="table-dark">
                                 <tr>
-                                    <th className="ps-4">ID Comandă</th>
-                                    <th>Data și Ora</th>
-                                    <th>Metodă Plată</th>
+                                    <th className="ps-4">ID Comanda</th>
+                                    <th>Data si Ora</th>
+                                    <th>Metoda Plata</th>
                                     <th className="pe-4 text-end">Total</th>
                                 </tr>
                             </thead>
@@ -56,7 +56,7 @@ const EmployeeHistory = () => {
                                 ) : (
                                     <tr>
                                         <td colSpan="4" className="text-center py-5 text-muted">
-                                            Nu ai nicio comandă înregistrată încă.
+                                            Nu ai nicio comanda inregistrata inca.
                                         </td>
                                     </tr>
                                 )}

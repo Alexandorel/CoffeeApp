@@ -16,7 +16,7 @@ const OrderHistory = () => {
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>📜 Istoric Comenzi</h2>
-                <button className="btn btn-secondary" onClick={() => navigate(-1)}>Înapoi</button>
+                <button className="btn btn-secondary" onClick={() => navigate(-1)}>Inapoi</button>
             </div>
             <table className="table table-striped shadow-sm">
                 <thead className="table-dark">
@@ -25,7 +25,7 @@ const OrderHistory = () => {
                         <th>Data</th>
                         <th>Angajat</th>
                         <th>Total</th>
-                        <th>Metodă Plată</th>
+                        <th>Metoda Plata</th>
                     </tr>
                 </thead>
                 <tbody>

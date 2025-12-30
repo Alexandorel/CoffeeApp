@@ -22,7 +22,7 @@ const AverageOrderModal = ({ show, onClose, value }) => {
             📊
           </div>
           <h3 className="fw-bold text-dark">Valoare Medie</h3>
-          <p className="text-muted small">Media banilor încasați pe fiecare comandă</p>
+          <p className="text-muted small">Media banilor incasati pe fiecare comanda</p>
         </div>
 
         <div className="py-3 mb-4 bg-light rounded-3">
@@ -31,11 +31,11 @@ const AverageOrderModal = ({ show, onClose, value }) => {
         </div>
 
         <p className="small text-secondary mb-4">
-          Acest indicator (AOV) te ajută să înțelegi cât cheltuie, în medie, un client la o vizită în cafenea.
+          Acest indicator (AOV) te ajuta sa intelegi cat cheltuie, in medie, un client la o vizita in cafenea.
         </p>
 
         <button className="btn btn-dark w-100 py-2 fw-bold shadow-sm" onClick={onClose}>
-          Închide Raportul
+          Inchide Raportul
         </button>
       </div>
     </div>

@@ -28,7 +28,7 @@ const EditCoffee = () => {
 
     return (
         <div className="container mt-5">
-            <h2>Editează Produs</h2>
+            <h2>Editeaza Produs</h2>
             <form onSubmit={handleSave}>
             <div className="mb-2">
                 <label className="form-label fw-bold">Denumire Produs:</label>
@@ -36,7 +36,7 @@ const EditCoffee = () => {
             </div>
 
             <div className="mb-2">
-                <label className="form-label fw-bold">Preț (RON):</label>
+                <label className="form-label fw-bold">Pret (RON):</label>
                 <input className="form-control" value={formData.pret} onChange={e => setFormData({...formData, pret: e.target.value})} placeholder="0.00" />
             </div>
             
@@ -45,7 +45,7 @@ const EditCoffee = () => {
                 <input className="form-control" value={formData.stoc} onChange={e => setFormData({...formData, stoc: e.target.value})} placeholder="0" />
             </div>
             
-            <button type="submit" className="btn btn-primary w-100 mt-2">Salvează</button>
+            <button type="submit" className="btn btn-primary w-100 mt-2">Salveaza</button>
         </form>
         </div>
     );

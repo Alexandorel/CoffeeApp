@@ -14,7 +14,7 @@ const PaymentModal = ({ show, onClose, onConfirm, paymentMethod, setPaymentMetho
         style={{ maxWidth: "400px", width: "90%" }} 
         onClick={(e) => e.stopPropagation()}
       >
-        <h4 className="mb-3 fw-bold text-primary">Alege metoda de plată</h4>
+        <h4 className="mb-3 fw-bold text-primary">Alege metoda de plata</h4>
         
         <div className="mb-4">
           <label className="form-check p-3 border rounded-3 mb-2 cursor-pointer shadow-sm" style={{ cursor: 'pointer' }}>
@@ -42,10 +42,10 @@ const PaymentModal = ({ show, onClose, onConfirm, paymentMethod, setPaymentMetho
 
         <div className="d-flex gap-2">
           <button className="btn btn-light w-50 py-2 fw-bold" onClick={onClose}>
-            Anulează
+            Anuleaza
           </button>
           <button className="btn btn-success w-50 py-2 fw-bold" onClick={onConfirm}>
-            Confirmă Plata
+            Confirma Plata
           </button>
         </div>
       </div>

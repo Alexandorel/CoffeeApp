@@ -10,16 +10,16 @@ const TopSalesModal = ({ show, onClose, data }) => {
       <div className="bg-white p-4 rounded-4 shadow-lg" 
            style={{ maxWidth: "450px", width: "90%" }}
            onClick={(e) => e.stopPropagation()}>
-        <h3 className="fw-bold text-center mb-4">🥇 Top Vânzări</h3>
+        <h3 className="fw-bold text-center mb-4">🥇 Top Vanzari</h3>
         <div className="list-group mb-4">
           {data.map((p, index) => (
-            <div key={index} className="list-group-item d-flex justify-content-between align-items-center">
-              <span>{p.denumire}</span>
-              <span className="badge bg-primary">{p.total_vandut} buc</span>
+            <div key={index} className="list-group-item d-flex justify-content-between align-items-center border-0 bg-light mb-2 rounded shadow-sm">
+              <span className="fw-bold">{p.denumire}</span>
+              <span className="badge bg-primary rounded-pill">{p.total_vandut} buc</span>
             </div>
           ))}
         </div>
-        <button className="btn btn-dark w-100" onClick={onClose}>Închide</button>
+        <button className="btn btn-dark w-100 fw-bold py-2" onClick={onClose}>Inchide</button>
       </div>
     </div>
   );

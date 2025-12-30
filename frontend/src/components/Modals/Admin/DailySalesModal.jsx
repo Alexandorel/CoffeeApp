@@ -15,7 +15,7 @@ const DailySalesModal = ({ show, onClose, data }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h4 className="fw-bold m-0">📊 Raport Vânzări Zilnice</h4>
+          <h4 className="fw-bold m-0">📊 Raport Vanzari Zilnice</h4>
           <button className="btn-close" onClick={onClose}></button>
         </div>
 
@@ -46,7 +46,7 @@ const DailySalesModal = ({ show, onClose, data }) => {
               ) : (
                 <tr>
                   <td colSpan="3" className="text-center text-muted py-3">
-                    Nu există date pentru perioada selectată.
+                    Nu exista date pentru perioada selectata.
                   </td>
                 </tr>
               )}
@@ -56,12 +56,12 @@ const DailySalesModal = ({ show, onClose, data }) => {
 
         <div className="mt-3 p-3 bg-light rounded-3">
           <small className="text-muted d-block">
-            * Datele reflectă ultimele 7 zile de activitate din baza de date.
+            * Datele reflecta ultimele 7 zile de activitate din baza de date.
           </small>
         </div>
 
         <button className="btn btn-dark w-100 mt-3 py-2 fw-bold" onClick={onClose}>
-          Închide Raportul
+          Inchide Raportul
         </button>
       </div>
     </div>

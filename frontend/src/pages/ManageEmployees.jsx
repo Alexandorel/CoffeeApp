@@ -9,7 +9,7 @@ const ManageEmployees = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Încarcam angajatii la pornire
+  // Incarcam angajatii la pornire
   // Inlocuieste vechiul useEffect cu acesta:
 useEffect(() => {
   const delayDebounceFn = setTimeout(() => {
@@ -42,21 +42,21 @@ useEffect(() => {
   };
 
   const handleDelete = (id) => {
-    // Confirmare înainte de ștergere
-    if (window.confirm("Esti sigur ca vrei sa sșergi acest angajat?")) {
+    // Confirmare inainte de stergere
+    if (window.confirm("Esti sigur ca vrei sa stergi acest angajat?")) {
       axios.delete(`/angajati/${id}`)
         .then(() => {
-          // Actualizăm lista local (fără refresh la pagină)
+          // Actualizam lista local (fara refresh la pagina)
           setAngajati(angajati.filter((angajat) => angajat.idAngajat !== id));
         })
-        .catch((err) => alert("Eroare la ștergere!"));
+        .catch((err) => alert("Eroare la stergere!"));
     }
   };
 
   return (
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">👥 Gestionare Angajați</h2>
+        <h2 className="fw-bold">👥 Gestionare Angajati</h2>
 
         <Link to="/adaugare-angajat" className="btn btn-primary btn-lg shadow fw-bold me-2">
           Adaugare Angajat
@@ -107,7 +107,7 @@ useEffect(() => {
                       className="btn btn-warning btn-sm me-2 fw-bold"
                       onClick={() => navigate(`/editare-angajat/${angajat.idAngajat}`)}
                     >
-                      Editează
+                      Editeaza
                     </button>
                     <button
                       className="btn btn-info btn-sm me-2 fw-bold text-white"
@@ -128,7 +128,7 @@ useEffect(() => {
           </table>
 
           {angajati.length === 0 && (
-            <div className="text-center p-3">Nu exista angajati înregistrati.</div>
+            <div className="text-center p-3">Nu exista angajati inregistrati.</div>
           )}
         </div>
       </div>

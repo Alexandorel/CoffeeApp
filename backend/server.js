@@ -105,29 +105,6 @@ app.post('/adauga-cafea', (req, res) => {
     });
 });
 
-// Stergere produs - De adaugat in documentatie
-app.delete('/sterge-cafea/:id', (req, res) => {
-    const idProdus = req.params.id;
-
-    // Stergem mai intai din tabelele dependente pentru a evita erorile de Foreign Key
-    const sqlPF = "DELETE FROM ProdusFurnizor WHERE idProdus = ?";
-    db.query(sqlPF, [idProdus], (err) => {
-        if (err) return res.status(500).json({ error: "Eroare la stergere ProdusFurnizor" });
-
-        const sqlCafea = "DELETE FROM Cafea WHERE idProdus = ?";
-        db.query(sqlCafea, [idProdus], (err) => {
-            if (err) return res.status(500).json({ error: "Eroare la stergere Cafea" });
-
-            const sqlProdus = "DELETE FROM Produs WHERE idProdus = ?";
-            db.query(sqlProdus, [idProdus], (err, result) => {
-                if (err) return res.status(500).json({ error: "Eroare la stergere Produs" });
-                res.json({ message: "Produs sters cu succes!" });
-            });
-        });
-    });
-});
-
-
 // interogare cafea
 app.get('/cafele', (req, res) => {
     const sql = `
@@ -154,6 +131,38 @@ app.get('/cafele', (req, res) => {
             return res.status(500).send("Eroare server");
         }
         res.json(result);
+    });
+});
+
+// Stergere produs - De adaugat in documentatie
+app.delete('/sterge-cafea/:id', (req, res) => {
+    const idProdus = req.params.id;
+
+    // Stergem mai intai din tabelele dependente pentru a evita erorile de Foreign Key
+    const sqlPF = "DELETE FROM ProdusFurnizor WHERE idProdus = ?";
+    db.query(sqlPF, [idProdus], (err) => {
+        if (err) return res.status(500).json({ error: "Eroare la stergere ProdusFurnizor" });
+
+        const sqlCafea = "DELETE FROM Cafea WHERE idProdus = ?";
+        db.query(sqlCafea, [idProdus], (err) => {
+            if (err) return res.status(500).json({ error: "Eroare la stergere Cafea" });
+
+            const sqlProdus = "DELETE FROM Produs WHERE idProdus = ?";
+            db.query(sqlProdus, [idProdus], (err, result) => {
+                if (err) return res.status(500).json({ error: "Eroare la stergere Produs" });
+                res.json({ message: "Produs sters cu succes!" });
+            });
+        });
+    });
+});
+
+// interogare cafea individuala pentru modificare
+app.get('/cafele/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT c.*, p.stoc FROM Cafea c JOIN Produs p ON c.idProdus = p.idProdus WHERE c.idProdus = ?";
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json(result[0]);
     });
 });
 
@@ -269,16 +278,6 @@ app.get('/angajati/cautare', (req, res) => {
     db.query(sql, [searchTerm, searchTerm, searchTerm], (err, results) => {
         if (err) return res.status(500).json(err);
         res.json(results);
-    });
-});
-
-// interogare cafea individuala pentru modificare
-app.get('/cafele/:id', (req, res) => {
-    const id = req.params.id;
-    const sql = "SELECT c.*, p.stoc FROM Cafea c JOIN Produs p ON c.idProdus = p.idProdus WHERE c.idProdus = ?";
-    db.query(sql, [id], (err, result) => {
-        if (err) return res.status(500).json(err);
-        res.json(result[0]);
     });
 });
 
