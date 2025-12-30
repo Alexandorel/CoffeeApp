@@ -105,6 +105,28 @@ app.post('/adauga-cafea', (req, res) => {
     });
 });
 
+// Stergere produs - De adaugat in documentatie
+app.delete('/sterge-cafea/:id', (req, res) => {
+    const idProdus = req.params.id;
+
+    // Stergem mai intai din tabelele dependente pentru a evita erorile de Foreign Key
+    const sqlPF = "DELETE FROM ProdusFurnizor WHERE idProdus = ?";
+    db.query(sqlPF, [idProdus], (err) => {
+        if (err) return res.status(500).json({ error: "Eroare la stergere ProdusFurnizor" });
+
+        const sqlCafea = "DELETE FROM Cafea WHERE idProdus = ?";
+        db.query(sqlCafea, [idProdus], (err) => {
+            if (err) return res.status(500).json({ error: "Eroare la stergere Cafea" });
+
+            const sqlProdus = "DELETE FROM Produs WHERE idProdus = ?";
+            db.query(sqlProdus, [idProdus], (err, result) => {
+                if (err) return res.status(500).json({ error: "Eroare la stergere Produs" });
+                res.json({ message: "Produs sters cu succes!" });
+            });
+        });
+    });
+});
+
 
 // interogare cafea
 app.get('/cafele', (req, res) => {
@@ -410,6 +432,50 @@ app.get('/statistici/medie-comanda', (req, res) => {
         res.json({ medieComanda: data });
     });
 });
+
+// Schimbare parolă angajat
+app.put('/schimba-parola/:id', (req, res) => {
+    const idAngajat = req.params.id;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: "Toate câmpurile sunt obligatorii" });
+    }
+
+    // Pasul 1: Verificăm dacă parola veche introdusă corespunde cu cea din baza de date
+    const sqlCheck = "SELECT password FROM Angajat WHERE idAngajat = ?";
+
+    db.query(sqlCheck, [idAngajat], (err, results) => {
+        if (err) {
+            console.error("Eroare SQL la verificare parolă:", err);
+            return res.status(500).json({ message: "Eroare de server" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "Angajatul nu a fost găsit" });
+        }
+
+        const parolaActualaDinDB = results[0].password;
+
+        if (oldPassword !== parolaActualaDinDB) {
+            return res.status(401).json({ message: "Parola actuală este incorectă" });
+        }
+
+        // Pasul 2: Dacă parola veche este corectă, o actualizăm cu cea nouă
+        const sqlUpdate = "UPDATE Angajat SET password = ? WHERE idAngajat = ?";
+
+        db.query(sqlUpdate, [newPassword, idAngajat], (errUpdate, result) => {
+            if (errUpdate) {
+                console.error("Eroare SQL la actualizare parolă:", errUpdate);
+                return res.status(500).json({ message: "Eroare la actualizarea parolei" });
+            }
+
+            res.json({ message: "Parola a fost actualizată cu succes!" });
+        });
+    });
+});
+
+
 
 app.listen(port, () => {
     console.log(`Server asculta pe portul ${port}`);

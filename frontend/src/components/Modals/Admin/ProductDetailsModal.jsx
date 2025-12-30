@@ -4,6 +4,8 @@ const ProductDetailsModal = ({ show, coffee, onClose, onEdit }) => {
   if (!show || !coffee) return null;
 
   return (
+    
+
     <div
       className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
       style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 3000 }}

@@ -5,6 +5,7 @@ import axios from "axios";
 // IMPORTĂ COMPONENTELE COMUNE
 import PaymentModal from "../components/Modals/Common/PaymentModal";
 import ProductDetailsModal from "../components/Modals/Common/ProductDetailsModal";
+import ChangePasswordModal from "../components/Modals/Common/ChangePasswordModal";
 
 const EmployeeDashboard = () => {
   const [coffees, setCoffees] = useState([]);
@@ -18,6 +19,9 @@ const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // stare schimbare parola
+  const [showPassModal, setShowPassModal] = useState(false);
+
   useEffect(() => {
     fetchCoffees();
   }, []);
@@ -29,12 +33,11 @@ const EmployeeDashboard = () => {
       .catch((err) => console.error("Eroare la preluarea cafelelor:", err));
   };
 
-  // FUNCȚIA ACTUALIZATĂ CU VERIFICARE STOC
   const addToCart = (coffee) => {
     const stocDisponibil = coffee.stoc ?? 0;
 
     if (stocDisponibil <= 0) {
-      alert(`Ne pare rău, ${coffee.denumire} nu mai este în stoc!`);
+      alert(`Ne pare rau, ${coffee.denumire} nu mai este în stoc!`);
       return;
     }
 
@@ -120,6 +123,12 @@ const EmployeeDashboard = () => {
         isAdmin={false}
       />
 
+      <ChangePasswordModal
+        show={showPassModal}
+        onClose={() => setShowPassModal(false)}
+        employeeId={user?.idAngajat || user?.angajat?.idAngajat}
+      />
+
       {/* Header */}
       <header className="bg-dark text-white py-3 shadow">
         <div className="container-fluid px-4 d-flex justify-content-between align-items-center">
@@ -127,7 +136,16 @@ const EmployeeDashboard = () => {
             <span style={{ fontSize: "30px" }}>☕</span>
             <h2 className="fw-bold m-0">VintHUB POS - Staff</h2>
           </div>
-          <button onClick={() => navigate('/')} className="btn btn-outline-danger fw-bold btn-sm">🚪 Logout</button>
+          <div className="d-flex gap-2">
+            {/* BUTON SCHIMBARE PAROLA */}
+            <button
+              onClick={() => setShowPassModal(true)}
+              className="btn btn-outline-warning fw-bold btn-sm d-flex align-items-center gap-1"
+            >
+              Parola
+            </button>
+            <button onClick={() => navigate('/')} className="btn btn-outline-danger fw-bold btn-sm">Logout</button>
+          </div>
         </div>
       </header>
 
@@ -240,7 +258,7 @@ const EmployeeDashboard = () => {
                 className={`btn w-100 py-3 fw-bold ${cart.length === 0 ? 'btn-secondary' : 'btn-success'}`}
                 onClick={() => setShowPaymentModal(true)}
                 disabled={cart.length === 0}
-              >✅ PLASEAZA COMANDA</button>
+              >PLASEAZA COMANDA</button>
             </div>
           </div>
         </div>

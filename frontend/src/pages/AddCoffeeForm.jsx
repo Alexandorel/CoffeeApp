@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // <--- IMPORT NOU
+import { useNavigate } from "react-router-dom";
 
 const AddCoffeeForm = ({ onProductAdded }) => {
-  const navigate = useNavigate(); // <--- INIȚIALIZARE HOOK
+  const navigate = useNavigate(); 
 
-  // State pentru toate câmpurile formularului
+  // State pentru toate campurile formularului
   const [formData, setFormData] = useState({
     nume: "",
     tipBoaba: "Arabica",
     origine: "",
     prajire: "Medie",
     pret: "",
-    // dimensiune: "1kg",  <-- Șters
     stoc: "",
     idFurnizor: ""
   });
@@ -51,10 +50,9 @@ const AddCoffeeForm = ({ onProductAdded }) => {
         
         if (onProductAdded) onProductAdded();
         
-        // Opțional: Te poți întoarce automat după 2 secunde
         setTimeout(() => {
             setMessage(null);
-            navigate("/adminDashboard"); // Decomentează dacă vrei redirect automat
+            navigate("/adminDashboard"); 
         }, 3000);
       })
       .catch((err) => {

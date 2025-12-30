@@ -9,6 +9,7 @@ import PaymentModal from "../components/Modals/Common/PaymentModal";
 import PaymentStatsModal from "../components/Modals/Admin/PaymentStatsModal";
 import ProductDetailsModal from "../components/Modals/Common/ProductDetailsModal";
 import AverageOrderModal from "../components/Modals/Admin/AverageOrderModal";
+import ChangePasswordModal from "../components/Modals/Common/ChangePasswordModal";
 
 const AdminDashboard = () => {
   const [coffees, setCoffees] = useState([]);
@@ -34,6 +35,9 @@ const AdminDashboard = () => {
   // stare avg valoare comenzi
   const [showAvgModal, setShowAvgModal] = useState(false);
   const [averageValue, setAverageValue] = useState(0);
+
+  // stare schimbare parola
+  const [showPassModal, setShowPassModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -149,6 +153,29 @@ const AdminDashboard = () => {
     }
   };
 
+// Functia de stergere
+const handleDelete = async (idProdus, nume) => {
+  // Cerem o confirmare inainte de a sterge date din baza de date
+  if (window.confirm(`Esti sigur ca vrei sa stergi definitiv produsul "${nume}"?`)) {
+    try {
+      // Trimitem cererea catre backend
+      await axios.delete(`http://localhost:8000/sterge-cafea/${idProdus}`);
+      
+      // 1. Inchidem modalul
+      setSelectedCoffee(null);
+      
+      // 2. Reincarcam lista de cafele (la fel cum faci la confirmOrder)
+      const res = await axios.get("http://localhost:8000/cafele");
+      setCoffees(res.data);
+      
+      alert("Produsul a fost eliminat cu succes!");
+    } catch (err) {
+      console.error("Eroare la stergere:", err);
+      alert("Nu s-a putut sterge produsul. Probabil este inclus in comenzi existente.");
+    }
+  }
+};
+
   const filteredCoffees = coffees.filter((coffee) =>
     coffee.denumire.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -216,6 +243,7 @@ const AdminDashboard = () => {
         onClose={() => setSelectedCoffee(null)}
         product={selectedCoffee}
         onEdit={handleEdit}
+        onDelete={handleDelete}
         isAdmin={true}
       />
 
@@ -261,13 +289,31 @@ const AdminDashboard = () => {
         value={averageValue}
       />
 
+      <ChangePasswordModal 
+      show={showPassModal} 
+      onClose={() => setShowPassModal(false)} 
+      employeeId={user?.idAngajat || user?.angajat?.idAngajat}
+    />
+
       {/* Header */}
       <header className="bg-dark text-white py-3 shadow">
-        <div className="container-fluid px-4 d-flex justify-content-between align-items-center">
-          <h2 className="fw-bold m-0">VintHUB POS</h2>
-          <button onClick={() => navigate("/")} className="btn btn-outline-danger fw-bold btn-sm">Logout</button>
+      <div className="container-fluid px-4 d-flex justify-content-between align-items-center">
+        <div className="d-flex align-items-center gap-3">
+          <span style={{ fontSize: "30px" }}>☕</span>
+          <h2 className="fw-bold m-0">VintHUB POS - Staff</h2>
         </div>
-      </header>
+        <div className="d-flex gap-2">
+          {/* BUTON SCHIMBARE PAROLA */}
+          <button 
+            onClick={() => setShowPassModal(true)} 
+            className="btn btn-outline-warning fw-bold btn-sm d-flex align-items-center gap-1"
+          >
+            Parola
+          </button>
+          <button onClick={() => navigate('/')} className="btn btn-outline-danger fw-bold btn-sm">Logout</button>
+        </div>
+      </div>
+    </header>
 
       {/* Mesaj succes */}
       {orderPlaced && (

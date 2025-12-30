@@ -1,6 +1,6 @@
 import React from "react";
 
-const ProductDetailsModal = ({ show, onClose, product, onEdit, isAdmin }) => {
+const ProductDetailsModal = ({ show, onClose, product, onEdit, onDelete, isAdmin }) => {
   if (!show || !product) return null;
 
   return (
@@ -37,11 +37,19 @@ const ProductDetailsModal = ({ show, onClose, product, onEdit, isAdmin }) => {
         <div className="d-flex gap-2 justify-content-end border-top pt-3">
           <button className="btn btn-secondary px-4" onClick={onClose}>Închide</button>
           
-          {/* Randare condiționată: butonul apare doar pentru Admin */}
+          {/* GRUPARE CU FRAGMENT PENTRU A EVITA EROAREA */}
           {isAdmin && (
-            <button className="btn btn-warning fw-bold text-dark px-4" onClick={onEdit}>
-              Editează
-            </button>
+            <>
+              <button className="btn btn-warning fw-bold text-dark px-4" onClick={onEdit}>
+                Editeaza
+              </button>
+              <button 
+                className="btn btn-danger fw-bold px-4" 
+                onClick={() => onDelete(product.idProdus, product.denumire)}
+              >
+                Sterge
+              </button>
+            </>
           )}
         </div>
       </div>
